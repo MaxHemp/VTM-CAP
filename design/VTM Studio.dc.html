@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/tokens/colors.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/tokens/typography.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/tokens/layout.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/tokens/effects.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/tokens/base.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/components/components.css">
+<link rel="stylesheet" href="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/styles.css">
+<script src="_ds/vtm-design-system-e7f83828-f2be-410e-8fb2-d8c1f88cdcc7/_ds_bundle.js"></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fbfcfe}
+body{font-family:var(--font-body);color:var(--text-primary)}
+a{color:#123fa6;text-decoration:none}a:hover{color:#0e3387;text-decoration:underline}
+button{font-family:inherit}
+input,select,textarea{font-family:inherit;color:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--focus) !important;box-shadow:0 0 0 3px rgb(36 104 232 / 0.16)}
+@keyframes vtm-step-pulse{0%,100%{box-shadow:0 0 0 0 rgb(36 104 232 / 0.35)}50%{box-shadow:0 0 0 8px rgb(36 104 232 / 0)}}
+@keyframes vtm-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes vtm-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#dce1e9;border-radius:6px;border:3px solid #fbfcfe}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;overflow:hidden;background:var(--surface-soft)">
+<sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+<aside data-screen-label="Navigation" style="width:238px;flex:none;display:flex;flex-direction:column;background:radial-gradient(circle at 100% 0%, rgb(36 104 232 / 0.22), transparent 42%), var(--gradient-brand-deep);color:rgb(255 255 255 / 0.75)">
+  <div style="padding:22px 18px 16px;border-bottom:1px solid rgb(255 255 255 / 0.10)">
+    <div style="width:180px;height:46px;overflow:hidden;display:flex;align-items:center;justify-content:center"><x-import component-from-global-scope="VTMDesignSystem_e7f838.Logo" variant="white" height="180px" hint-size="180px,46px"></x-import></div>
+    <div style="margin-top:10px;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.14em;color:var(--c-brass-300)">STUDIO · REDAKTIONSPLATTFORM</div>
+  </div>
+  <nav style="display:flex;flex-direction:column;gap:2px;padding:14px 12px 8px">
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="4">
+      <button style="{{ n.style }}" onClick="{{ n.onClick }}">{{ n.label }}</button>
+    </sc-for>
+  </nav>
+  <div style="padding:12px 12px 0;border-top:1px solid rgb(255 255 255 / 0.10)">
+    <div style="padding:0 12px 6px;font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.12em;color:rgb(255 255 255 / 0.42)">EXTERN</div>
+    <button style="{{ apprNavStyle }}" onClick="{{ goApproval }}">Sponsored-Freigabe (d.velop)</button>
+  </div>
+  <div style="flex:1"></div>
+  <div style="padding:16px 18px;border-top:1px solid rgb(255 255 255 / 0.10);display:grid;gap:8px">
+    <div style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.12em;color:rgb(255 255 255 / 0.42)">ANGEMELDET ALS</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--c-blue-700);color:#fff;font-size:0.7rem;font-weight:700">MB</div>
+      <div style="min-width:0">
+        <div style="color:#fff;font-size:0.82rem;font-weight:600">Max Brenner</div>
+        <select value="{{ role }}" onChange="{{ onRole }}" style="margin-top:2px;background:transparent;border:1px solid rgb(255 255 255 / 0.22);border-radius:4px;color:rgb(255 255 255 / 0.75);font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.06em;padding:2px 4px;cursor:pointer">
+          <option style="color:#121e39">Herausgeber</option>
+          <option style="color:#121e39">Redakteur</option>
+        </select>
+      </div>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.1em;color:rgb(255 255 255 / 0.32)">VTM STUDIO 0.9 · DEMO</div>
+  </div>
+</aside>
+</sc-if>
+<main style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden">
+<sc-if value="{{ isPipeline }}" hint-placeholder-val="{{ true }}">
+<section data-screen-label="Pipeline" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+  <header style="flex:none;display:flex;align-items:center;gap:12px;padding:18px 28px;background:var(--c-white);border-bottom:1px solid var(--border-soft)">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;color:var(--text-muted)">REDAKTION / ARTIKEL-PIPELINE</div>
+      <h1 style="margin:3px 0 0;font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-0.035em">Pipeline</h1>
+    </div>
+    <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Artikel suchen …" style="width:210px;min-height:40px;padding:0 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.86rem;background:var(--c-white)">
+    <select value="{{ filter }}" onChange="{{ onFilter }}" style="min-height:40px;padding:0 10px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.82rem;background:var(--c-white);cursor:pointer">
+      <option value="alle">Alle Formate</option>
+      <option>Einordnung</option>
+      <option>Analyse</option>
+      <option>Praxis-Case</option>
+      <option>Leitfaden</option>
+      <option>Sponsored</option>
+      <option>Interview</option>
+    </select>
+    <button class="button button-primary" onClick="{{ goNew }}">Neuer Artikel</button>
+  </header>
+  <sc-if value="{{ boardEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:grid;place-items:center;padding:40px">
+      <div style="display:grid;justify-items:center;gap:12px;max-width:470px;text-align:center;padding:46px 42px;background:var(--c-paper);border:1px dashed var(--border-medium);border-radius:6px">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--c-neutral-500)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+        <strong style="font-family:var(--font-display);font-size:1.05rem;letter-spacing:-0.02em;color:var(--text-primary)">Keine Artikel in der Pipeline</strong>
+        <p style="margin:0;color:var(--text-secondary);font-size:0.88rem;line-height:1.6">Legen Sie ein Manuskript ab, um die automatische Aufbereitung zu starten, oder setzen Sie den Formatfilter zurück.</p>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button class="button button-primary" onClick="{{ goNew }}">Ersten Artikel anlegen</button>
+          <button class="button button-quiet" onClick="{{ resetFilter }}">Filter zurücksetzen</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ boardFilled }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;overflow:auto;padding:20px 28px 28px">
+    <div style="display:grid;grid-auto-flow:column;grid-auto-columns:276px;gap:14px;align-items:start;width:max-content;min-width:100%">
+      <sc-for list="{{ columns }}" as="col" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:10px;min-height:120px">
+          <div style="display:flex;align-items:baseline;gap:8px;padding:2px 4px">
+            <span style="font-family:var(--font-mono);font-size:0.64rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--text-primary)">{{ col.label }}</span>
+            <span style="font-family:var(--font-mono);font-size:0.64rem;font-weight:600;color:var(--c-blue-700)">{{ col.count }}</span>
+            <span style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.05em;color:var(--text-muted)">{{ col.hint }}</span>
+          </div>
+          <sc-if value="{{ col.empty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 14px;border:1px dashed var(--border-soft);border-radius:6px;color:var(--text-muted);font-size:0.78rem;text-align:center">Keine Artikel</div>
+          </sc-if>
+          <sc-for list="{{ col.cards }}" as="c" hint-placeholder-count="1">
+            <article class="card" style="padding:14px 16px;cursor:pointer" onClick="{{ c.onClick }}">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+                <span class="{{ c.tagClass }}" style="min-height:22px;padding:0.14rem 0.4rem;font-size:0.58rem">{{ c.format }}</span>
+                <span style="flex:1"></span>
+                <span style="{{ c.scoreStyle }}">{{ c.scoreLabel }}</span>
+              </div>
+              <h3 style="margin:0 0 10px;font-family:var(--font-body);font-size:0.9rem;font-weight:700;line-height:1.4;letter-spacing:0;color:var(--text-primary)">{{ c.title }}</h3>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text-muted)">{{ c.author }}</span>
+                <span style="flex:1"></span>
+                <sc-for list="{{ c.checks }}" as="k" hint-placeholder-count="3"><span style="{{ k.style }}" title="{{ k.title }}"></span></sc-for>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+</section>
+</sc-if>
+<sc-if value="{{ isNew }}" hint-placeholder-val="{{ false }}"><section data-screen-label="Neuer Artikel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+  <header style="flex:none;display:flex;align-items:center;gap:12px;padding:18px 28px;background:var(--c-white);border-bottom:1px solid var(--border-soft)">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;color:var(--text-muted)">REDAKTION / NEUER ARTIKEL</div>
+      <h1 style="margin:3px 0 0;font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-0.035em">Neuer Artikel</h1>
+    </div>
+    <button class="button button-quiet" onClick="{{ goPipeline }}">Zur Pipeline</button>
+  </header>
+  <div style="flex:1;overflow:auto;padding:24px 28px">
+  <sc-if value="{{ notProcessing }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;max-width:1160px;align-items:start">
+      <div class="card" style="padding:22px">
+        <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:14px">MANUSKRIPT</div>
+        <sc-if value="{{ noFile }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ addFile }}" style="display:grid;justify-items:center;gap:12px;width:100%;padding:64px 32px;background:var(--c-paper-blue);border:1.5px dashed var(--border-medium);border-radius:6px;cursor:pointer;text-align:center">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--c-blue-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"></path></svg>
+            <strong style="font-family:var(--font-display);font-size:1rem;letter-spacing:-0.02em;color:var(--text-primary)">Manuskript hier ablegen</strong>
+            <span style="color:var(--text-secondary);font-size:0.85rem;line-height:1.6">oder klicken, um eine Datei auszuwählen.<br>Der fertige Autorentext wird unverändert übernommen.</span>
+            <span style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.06em;color:var(--text-muted)">DOCX · MARKDOWN · TXT · PDF · MAX. 20 MB</span>
+          </button>
+        </sc-if>
+        <sc-if value="{{ hasFile }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--border-electric);border-radius:6px;background:var(--c-blue-050)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--c-blue-800)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"></path><path d="M14 3v5h5"></path></svg>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:var(--font-mono);font-size:0.74rem;font-weight:600;color:var(--text-primary)">{{ fileName }}</div>
+              <div style="margin-top:2px"><span class="status status-good" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.56rem">Hochgeladen</span></div>
+            </div>
+            <button class="button button-quiet" onClick="{{ removeFile }}" style="min-height:34px;padding:0.3rem 0.7rem;font-size:0.8rem">Entfernen</button>
+          </div>
+          <p style="margin:14px 0 0;color:var(--text-muted);font-size:0.8rem;line-height:1.6">Erkannt: 1.840 Wörter, 6 Zwischenüberschriften, 3 Quellenangaben. Die Struktur wird beim Verarbeiten gegen die VTM-Redaktionsanleitung geprüft.</p>
+        </sc-if>
+      </div>
+      <div class="card" style="padding:22px;display:grid;gap:16px">
+        <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">BRIEFING</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="display:grid;gap:6px">
+            <label style="font-size:0.8rem;font-weight:700">Kategorie</label>
+            <select value="{{ kategorie }}" onChange="{{ onKategorie }}" style="min-height:42px;padding:0 10px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white);cursor:pointer">
+              <option>KI &amp; Automatisierung</option>
+              <option>Kernsysteme</option>
+              <option>Markt &amp; Strategie</option>
+              <option>Regulatorik</option>
+              <option>IT-Security</option>
+            </select>
+          </div>
+          <div style="display:grid;gap:6px">
+            <label style="font-size:0.8rem;font-weight:700">Artikelformat</label>
+            <select value="{{ artFormat }}" onChange="{{ onArtFormat }}" style="min-height:42px;padding:0 10px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white);cursor:pointer">
+              <option>Einordnung</option>
+              <option>Analyse</option>
+              <option>Praxis-Case</option>
+              <option>Leitfaden</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;gap:6px">
+          <label style="font-size:0.8rem;font-weight:700">Zentrale Frage</label>
+          <input value="{{ frage }}" onChange="{{ onFrage }}" placeholder="Welche Frage beantwortet der Artikel?" style="min-height:42px;padding:0 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white)">
+        </div>
+        <div style="display:grid;gap:6px">
+          <label style="font-size:0.8rem;font-weight:700">Anlass</label>
+          <input value="{{ anlass }}" onChange="{{ onAnlass }}" placeholder="z. B. Pressemitteilung, Studie, Regulatorik-Termin" style="min-height:42px;padding:0 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white)">
+        </div>
+        <div style="display:grid;gap:6px">
+          <label style="font-size:0.8rem;font-weight:700">CTA-Ziel</label>
+          <select value="{{ cta }}" onChange="{{ onCta }}" style="min-height:42px;padding:0 10px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white);cursor:pointer">
+            <option>AI Insurance Briefing abonnieren</option>
+            <option>VTM-App installieren</option>
+            <option>Research-Report anfordern</option>
+            <option>Webinar-Anmeldung</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border-soft);border-radius:6px;background:var(--c-paper)">
+          <button style="{{ togTrack }}" onClick="{{ toggleSpon }}" aria-label="Sponsored Content umschalten"><span style="{{ togKnob }}"></span></button>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:0.84rem;font-weight:700">Sponsored Content</div>
+            <div style="color:var(--text-muted);font-size:0.74rem;line-height:1.5">Kennzeichnung „Anzeige“, Kundenfreigabe wird Pflichtschritt.</div>
+          </div>
+        </div>
+        <sc-if value="{{ spon }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;gap:6px">
+            <label style="font-size:0.8rem;font-weight:700">Kundenname</label>
+            <input value="{{ client }}" onChange="{{ onClient }}" placeholder="z. B. d.velop" style="min-height:42px;padding:0 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white)">
+          </div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:2px">
+          <button class="button button-primary" onClick="{{ onStart }}" disabled="{{ startDisabled }}">Verarbeitung starten</button>
+          <span style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.05em;color:var(--text-muted)">4 SCHRITTE · CA. 40 SEKUNDEN</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ processing }}" hint-placeholder-val="{{ false }}">
+    <div style="display:grid;place-items:center;min-height:100%">
+      <div class="card" style="width:min(560px,100%);padding:30px 32px">
+        <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">VERARBEITUNG</div>
+        <h2 style="margin:8px 0 4px;font-family:var(--font-display);font-size:1.2rem;font-weight:800;letter-spacing:-0.03em">Manuskript wird aufbereitet</h2>
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-secondary);margin-bottom:22px">{{ fileName }}</div>
+        <div style="display:grid;gap:0">
+          <sc-for list="{{ steps }}" as="st" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--border-soft)">
+              <span style="{{ st.dotStyle }}">{{ st.num }}</span>
+              <span style="{{ st.labelStyle }}">{{ st.label }}</span>
+              <span style="flex:1"></span>
+              <span style="{{ st.stateStyle }}">{{ st.state }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:18px 0 0;color:var(--text-muted);font-size:0.78rem;line-height:1.6">Der Autorentext wird nicht verändert. Ergänzt werden Struktur, HTML-Card im Corporate Design und die Prüfberichte.</p>
+      </div>
+    </div>
+  </sc-if>
+  </div>
+</section></sc-if>
+<sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}"><section data-screen-label="Artikel-Review" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+  <header style="flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 20px;background:var(--c-white);border-bottom:1px solid var(--border-soft)">
+    <button class="button button-quiet" onClick="{{ goPipeline }}" style="min-height:36px;padding:0.3rem 0.7rem;font-size:0.82rem">← Pipeline</button>
+    <div style="width:1px;height:26px;background:var(--border-soft)"></div>
+    <div style="flex:1;min-width:240px">
+      <div style="font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.12em;color:var(--text-muted)">ARTIKEL-REVIEW</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:2px;min-width:0">
+        <h1 style="margin:0;font-family:var(--font-display);font-size:1.02rem;font-weight:800;letter-spacing:-0.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ rvTitle }}</h1>
+        <span class="{{ rvTagClass }}" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.56rem;flex:none">{{ rvFormat }}</span>
+      </div>
+    </div>
+    <span style="font-family:var(--font-mono);font-size:0.68rem;font-weight:600;color:var(--c-brass-700);border:1px solid var(--border-brass);border-radius:4px;padding:6px 10px;background:#fffdf7">SCORE {{ rvScoreChip }}</span>
+    <sc-if value="{{ rvIsSponsored }}" hint-placeholder-val="{{ false }}">
+      <button class="button button-quiet" onClick="{{ goApproval }}" style="min-height:36px;padding:0.3rem 0.7rem;font-size:0.82rem">Kundenansicht</button>
+    </sc-if>
+    <button class="button button-secondary" onClick="{{ goLinkedinFromReview }}" style="min-height:38px;padding:0.4rem 0.9rem;font-size:0.86rem">LinkedIn-Post erstellen</button>
+    <button class="button button-primary" onClick="{{ openGhost }}" aria-disabled="{{ ghostAria }}" style="min-height:38px;padding:0.4rem 0.9rem;font-size:0.86rem">Nach Ghost übertragen</button>
+  </header>
+  <div style="display:grid;grid-template-columns:250px minmax(460px,1fr) 338px;flex:1;min-height:0;overflow-x:auto">
+    <aside style="overflow:auto;background:var(--c-white);border-right:1px solid var(--border-soft);padding:14px 10px">
+      <div style="padding:0 10px 10px;font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">STRUKTUR / REDAKTIONSANLEITUNG</div>
+      <div style="display:grid;gap:1px">
+        <sc-for list="{{ outline }}" as="o" hint-placeholder-count="10">
+          <button style="{{ o.style }}" onClick="{{ o.onClick }}">
+            <span style="{{ o.numStyle }}">{{ o.num }}</span>
+            <span style="flex:1;min-width:0">{{ o.label }}
+              <span style="display:block;font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.04em;color:var(--c-brass-700)">{{ o.note }}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+    <div style="display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--surface-muted)">
+      <div style="flex:none;display:flex;align-items:center;gap:14px;padding:10px 20px;border-bottom:1px solid var(--border-soft);background:rgb(255 255 255 / 0.7)">
+        <div style="display:flex;gap:5px">
+          <sc-for list="{{ viewBtns }}" as="b" hint-placeholder-count="2"><button style="{{ b.style }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for>
+        </div>
+        <div style="width:1px;height:20px;background:var(--border-soft)"></div>
+        <div style="display:flex;gap:5px">
+          <sc-for list="{{ deviceBtns }}" as="b" hint-placeholder-count="2"><button style="{{ b.style }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for>
+        </div>
+        <span style="flex:1"></span>
+        <sc-if value="{{ isOutlook }}" hint-placeholder-val="{{ false }}">
+          <span style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.05em;color:var(--c-warning)">SIMULATION: ECKIGE KANTEN, VOLLFARBEN STATT VERLÄUFEN</span>
+        </sc-if>
+      </div>
+      <div id="pv-scroll" style="flex:1;overflow:auto;padding:26px 28px">
+        <article style="{{ pvStyle }}">
+          <sc-if value="{{ rvIsSponsored }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-bottom:14px"><span class="tag tag-brass">Anzeige · Sponsored Content</span></div>
+          </sc-if>
+          <div id="pv-kat" style="font-family:var(--font-mono);font-size:0.66rem;font-weight:600;letter-spacing:0.12em;color:var(--c-blue-800)">{{ rvKat }}</div>
+          <div id="pv-hint" style="{{ pvHintStyle }}">
+            <div style="font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.08em;color:var(--c-blue-800);margin-bottom:4px">VTM APP-HINWEIS</div>
+            <div style="font-size:0.84rem;line-height:1.55;color:var(--text-secondary)">Dieser Beitrag erscheint zuerst im <strong style="color:var(--text-primary)">AI Insurance Briefing</strong>. Alle Analysen und Research-Daten lesen Sie in der VTM-App.</div>
+          </div>
+          <h1 style="margin:14px 0 10px;font-family:var(--font-display);font-size:1.7rem;font-weight:800;letter-spacing:-0.045em;line-height:1.15">{{ rvTitle }}</h1>
+          <p id="pv-lead" style="margin:0 0 6px;font-size:1.02rem;font-weight:600;line-height:1.6;color:var(--text-primary)">{{ rvLead }}</p>
+          <div style="margin:10px 0 0;font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.05em;color:var(--text-muted)">{{ rvAuthor }} · 24. JULI 2026 · LESEZEIT 6 MIN</div>
+          <div id="pv-wichtig" style="{{ pvBoxStyle }}">
+            <div style="font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px">DAS WICHTIGSTE</div>
+            <ol style="margin:0;padding-left:18px;display:grid;gap:8px">
+              <sc-for list="{{ rvWichtig }}" as="w" hint-placeholder-count="3"><li style="font-size:0.88rem;line-height:1.55;color:var(--text-primary)">{{ w }}</li></sc-for>
+            </ol>
+          </div>
+          <sc-for list="{{ rvSections }}" as="sec" hint-placeholder-count="4">
+            <div id="{{ sec.id }}">
+              <h2 style="margin:26px 0 8px;font-family:var(--font-display);font-size:1.14rem;font-weight:700;letter-spacing:-0.03em">{{ sec.h2 }}</h2>
+              <p style="margin:0;font-size:0.94rem;line-height:1.7;color:var(--text-secondary)">{{ sec.text }}</p>
+            </div>
+          </sc-for>
+          <sc-if value="{{ rvNotSponsored }}" hint-placeholder-val="{{ true }}">
+            <div id="pv-gegen">
+              <h2 style="margin:26px 0 8px;font-family:var(--font-display);font-size:1.14rem;font-weight:700;letter-spacing:-0.03em">Gegenargumente und Grenzen</h2>
+              <p style="margin:0;font-size:0.94rem;line-height:1.7;color:var(--text-secondary)">{{ rvGegen }}</p>
+            </div>
+            <div id="pv-wert">
+              <h2 style="margin:26px 0 8px;font-family:var(--font-display);font-size:1.14rem;font-weight:700;letter-spacing:-0.03em">Redaktionelle Wertung</h2>
+              <p style="margin:0;padding:2px 0 2px 16px;border-left:3px solid var(--c-blue-700);font-family:var(--font-editorial);font-style:italic;font-size:1.04rem;line-height:1.65;color:var(--text-primary)">{{ rvWert }}</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ rvIsSponsored }}" hint-placeholder-val="{{ false }}">
+            <div id="pv-gegen-off" style="margin:24px 0;padding:14px 16px;border:1px dashed var(--border-medium);border-radius:4px;color:var(--text-muted);font-size:0.8rem;line-height:1.55">Gegenargumente und redaktionelle Wertung entfallen bei Sponsored Content. Grenzen des Projekts werden im Abschnitt „Grenzen und offene Punkte“ benannt.</div>
+          </sc-if>
+          <div id="pv-todo">
+            <h2 style="margin:26px 0 8px;font-family:var(--font-display);font-size:1.14rem;font-weight:700;letter-spacing:-0.03em">Was Versicherer jetzt tun sollten</h2>
+            <ul style="margin:0;padding-left:18px;display:grid;gap:7px">
+              <sc-for list="{{ rvTodo }}" as="t" hint-placeholder-count="3"><li style="font-size:0.94rem;line-height:1.6;color:var(--text-secondary)">{{ t }}</li></sc-for>
+            </ul>
+          </div>
+          <div id="pv-fazit">
+            <h2 style="margin:26px 0 8px;font-family:var(--font-display);font-size:1.14rem;font-weight:700;letter-spacing:-0.03em">Fazit</h2>
+            <p style="margin:0;font-size:0.94rem;line-height:1.7;color:var(--text-secondary)">{{ rvFazit }}</p>
+          </div>
+          <div id="pv-quellen">
+            <h2 style="margin:26px 0 8px;font-family:var(--font-display);font-size:1.14rem;font-weight:700;letter-spacing:-0.03em">Quellenverzeichnis</h2>
+            <ol style="margin:0;padding-left:18px;display:grid;gap:5px">
+              <sc-for list="{{ rvQuellen }}" as="q" hint-placeholder-count="3"><li style="font-family:var(--font-mono);font-size:0.72rem;line-height:1.6;color:var(--text-muted)">{{ q }}</li></sc-for>
+            </ol>
+          </div>
+          <div id="pv-cta" style="{{ pvCtaStyle }}">
+            <div style="font-family:var(--font-mono);font-size:0.56rem;font-weight:600;letter-spacing:0.12em;color:var(--c-brass-300);margin-bottom:8px">CTA · GENAU EINER PRO ARTIKEL</div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <strong style="flex:1;min-width:200px;font-family:var(--font-display);font-size:1.02rem;letter-spacing:-0.02em;color:#fff">{{ rvCta }}</strong>
+              <span style="display:inline-flex;align-items:center;min-height:38px;padding:0.4rem 1rem;background:#fff;color:var(--c-blue-800);border-radius:4px;font-size:0.86rem;font-weight:700">Kostenlos abonnieren</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+    <aside style="display:flex;flex-direction:column;min-height:0;background:var(--c-white);border-left:1px solid var(--border-soft)">
+      <div style="flex:none;display:flex;border-bottom:1px solid var(--border-soft)">
+        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="3"><button style="{{ tb.style }}" onClick="{{ tb.onClick }}">{{ tb.label }}</button></sc-for>
+      </div>
+      <div style="flex:1;overflow:auto;padding:18px 16px">
+        <sc-if value="{{ tabQ }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;justify-items:center;gap:10px;padding:4px 0 16px">
+            <div style="position:relative;width:104px;height:104px">
+              <svg width="104" height="104" viewBox="0 0 104 104">
+                <circle cx="52" cy="52" r="34" fill="none" stroke="var(--c-neutral-100)" stroke-width="9"></circle>
+                <circle cx="52" cy="52" r="34" fill="none" stroke="{{ ringColor }}" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ ringCirc }}" stroke-dashoffset="{{ ringOff }}" transform="rotate(-90 52 52)"></circle>
+              </svg>
+              <div style="position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--text-primary)">{{ rvScoreChip }}</div>
+            </div>
+            <span class="{{ qBadgeClass }}" style="min-height:22px;padding:0.14rem 0.5rem;font-size:0.58rem">{{ qBadgeLabel }}</span>
+          </div>
+          <div style="display:grid">
+            <sc-for list="{{ qcats }}" as="qc" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--border-soft)">
+                <span style="flex:1;font-size:0.82rem;font-weight:600;color:var(--text-primary)">{{ qc.name }}</span>
+                <span style="{{ qc.d1 }}"></span>
+                <span style="{{ qc.d2 }}"></span>
+                <span style="{{ qc.ptsStyle }}">{{ qc.pts }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin:12px 0 0;font-size:0.74rem;line-height:1.6;color:var(--text-muted)">Je Kategorie 0 bis 2 Punkte. Artikel unter 13 Punkten gehen zurück in die Aufbereitung.</p>
+        </sc-if>
+        <sc-if value="{{ tabS }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <span style="{{ findingsSummaryStyle }}">{{ findingsSummary }}</span>
+          </div>
+          <div style="display:grid;gap:8px">
+            <sc-for list="{{ findings }}" as="f" hint-placeholder-count="3">
+              <div style="{{ f.boxStyle }}">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="{{ f.ruleStyle }}">{{ f.rule }}</span>
+                  <span style="flex:1"></span>
+                  <sc-if value="{{ f.hasJump }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ f.onJump }}" style="background:none;border:none;padding:0;color:var(--c-blue-700);font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.04em;cursor:pointer">ZUR STELLE →</button>
+                  </sc-if>
+                </div>
+                <div style="font-size:0.8rem;line-height:1.55;color:var(--text-secondary)">{{ f.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin:12px 0 0;font-size:0.74rem;line-height:1.6;color:var(--text-muted)">Geprüft: Em-Dashes, Buzzwords, Zahlenformate, Pflicht-Strukturelemente nach Redaktionsregeln v4.2.</p>
+        </sc-if>
+        <sc-if value="{{ tabF }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px">EXTRAHIERTE KERNAUSSAGEN</div>
+          <div style="display:grid;gap:8px">
+            <sc-for list="{{ claims }}" as="cl" hint-placeholder-count="4">
+              <div style="padding:11px 12px;border:1px solid var(--border-soft);border-radius:4px;background:var(--c-white)">
+                <div style="font-size:0.8rem;line-height:1.55;color:var(--text-primary);margin-bottom:8px">{{ cl.text }}</div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span class="{{ cl.badgeClass }}" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.54rem">{{ cl.badge }}</span>
+                  <span style="flex:1"></span>
+                  <a href="#" onClick="{{ cl.onSrc }}" style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.03em">{{ cl.src }}</a>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-soft)">
+          <div style="font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px">DIFFERENZIERUNGSCHECK</div>
+          <div style="display:grid;gap:6px;margin-bottom:10px">
+            <sc-for list="{{ diffRows }}" as="d" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="flex:1;font-size:0.8rem;font-weight:600;color:var(--text-primary)">{{ d.outlet }}</span>
+                <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted)">{{ d.label }}</span>
+                <span class="{{ d.cls }}" style="min-height:18px;padding:0.06rem 0.35rem;font-size:0.52rem">{{ d.tagLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:11px 13px;background:linear-gradient(90deg,rgb(18 63 166 / 0.055),transparent),var(--c-blue-050);border:1px solid rgb(18 63 166 / 0.15);border-left:3px solid var(--c-blue-700);border-radius:0 4px 4px 0;font-size:0.78rem;line-height:1.55;color:var(--text-secondary)">{{ diffNote }}</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section></sc-if>
+<sc-if value="{{ isLinkedin }}" hint-placeholder-val="{{ false }}"><section data-screen-label="LinkedIn Studio" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+  <header style="flex:none;display:flex;align-items:center;gap:12px;padding:18px 28px;background:var(--c-white);border-bottom:1px solid var(--border-soft)">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;color:var(--text-muted)">DISTRIBUTION / LINKEDIN STUDIO</div>
+      <h1 style="margin:3px 0 0;font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-0.035em">LinkedIn Studio</h1>
+    </div>
+  </header>
+  <div style="flex:1;overflow:auto;padding:22px 28px">
+    <div style="display:grid;grid-template-columns:minmax(380px,1fr) 440px;gap:22px;max-width:1240px;min-width:min-content;align-items:start">
+      <div style="display:grid;gap:14px">
+        <div class="card" style="padding:18px 20px;display:grid;gap:14px">
+          <div style="display:grid;gap:6px">
+            <label style="font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">ARTIKEL</label>
+            <select value="{{ liArt }}" onChange="{{ onLiArt }}" style="min-height:42px;padding:0 10px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.86rem;font-weight:600;background:var(--c-white);cursor:pointer">
+              <option value="a1">Neodigital gibt die BaFin-Lizenz zurück</option>
+              <option value="a3">Dunkelverarbeitung bei andsafe (Sponsored, d.velop)</option>
+            </select>
+          </div>
+          <div style="display:grid;gap:6px">
+            <label style="font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">KANAL</label>
+            <div style="display:flex;gap:6px">
+              <sc-for list="{{ chBtns }}" as="cb" hint-placeholder-count="2"><button style="{{ cb.style }}" onClick="{{ cb.onClick }}">{{ cb.label }}</button></sc-for>
+            </div>
+            <p style="margin:2px 0 0;font-size:0.76rem;line-height:1.55;color:var(--text-muted)">{{ channelHint }}</p>
+          </div>
+        </div>
+        <sc-for list="{{ posts }}" as="p" hint-placeholder-count="2">
+          <article class="card" style="padding:18px 20px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <span style="font-family:var(--font-mono);font-size:0.62rem;font-weight:700;letter-spacing:0.09em;color:var(--c-blue-800)">{{ p.num }}</span>
+              <span style="flex:1"></span>
+              <span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text-muted)">{{ p.chars }}</span>
+              <button class="button button-secondary" onClick="{{ p.onCopy }}" style="min-height:32px;padding:0.25rem 0.7rem;font-size:0.78rem">Kopieren</button>
+            </div>
+            <div style="white-space:pre-wrap;font-size:0.88rem;line-height:1.65;color:var(--text-primary)">{{ p.text }}</div>
+          </article>
+        </sc-for>
+      </div>
+      <div class="card" style="padding:18px 20px;display:grid;gap:14px;position:sticky;top:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">BEITRAGSBILD</span>
+          <span style="flex:1"></span>
+          <sc-for list="{{ fmtBtns }}" as="fb" hint-placeholder-count="2"><button style="{{ fb.style }}" onClick="{{ fb.onClick }}">{{ fb.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{ tplBtns }}" as="tb" hint-placeholder-count="3"><button style="{{ tb.style }}" onClick="{{ tb.onClick }}">{{ tb.label }}</button></sc-for>
+        </div>
+        <div style="{{ canvasStyle }}">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--c-brass-700),var(--c-brass-300),transparent 85%)"></div>
+          <div style="position:absolute;inset:0;opacity:0.3;background-image:linear-gradient(rgb(255 255 255 / 0.07) 1px,transparent 1px),linear-gradient(90deg,rgb(255 255 255 / 0.07) 1px,transparent 1px);background-size:36px 36px;-webkit-mask-image:linear-gradient(135deg,transparent 30%,#000);mask-image:linear-gradient(135deg,transparent 30%,#000)"></div>
+          <div style="position:absolute;top:16px;left:20px;font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.14em;color:var(--c-brass-300)">{{ liKicker }}</div>
+          <sc-if value="{{ liSponsored }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:16px;right:20px;font-family:var(--font-mono);font-size:0.52rem;font-weight:600;letter-spacing:0.1em;color:rgb(255 255 255 / 0.65)">ANZEIGE · IN KOOPERATION MIT D.VELOP</div>
+          </sc-if>
+          <sc-if value="{{ tKonzept }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;top:-30%;right:-12%;width:70%;aspect-ratio:1;border:1px solid rgb(255 255 255 / 0.14);border-radius:50%"></div>
+            <div style="position:absolute;top:6%;right:6%;width:42%;aspect-ratio:1;border:1px solid rgb(201 155 50 / 0.28);border-radius:50%"></div>
+            <div style="position:absolute;top:26%;right:26%;width:7px;height:7px;border-radius:50%;background:var(--c-blue-500);border:2px solid #fff;box-shadow:0 0 18px rgb(36 104 232 / 0.5)"></div>
+            <div style="position:absolute;left:20px;right:20px;bottom:52px;font-family:var(--font-editorial);font-size:1.42rem;font-weight:600;line-height:1.25;letter-spacing:-0.015em;color:#fff;text-wrap:pretty">{{ imgTitle }}</div>
+          </sc-if>
+          <sc-if value="{{ tZahlen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:20px;bottom:96px;font-family:var(--font-mono);font-size:3rem;font-weight:600;letter-spacing:-0.02em;color:var(--c-brass-300)">{{ liStat }}</div>
+            <div style="position:absolute;left:20px;right:20px;bottom:52px;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;line-height:1.6;color:rgb(255 255 255 / 0.75)">{{ liStatLabel }}</div>
+          </sc-if>
+          <sc-if value="{{ tZitat }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:20px;right:20px;top:44%;transform:translateY(-50%);font-family:var(--font-editorial);font-style:italic;font-size:1.2rem;font-weight:500;line-height:1.4;color:#fff;text-wrap:pretty">„{{ liQuote }}“</div>
+            <div style="position:absolute;left:20px;right:20px;bottom:52px;font-family:var(--font-mono);font-size:0.56rem;font-weight:600;letter-spacing:0.1em;color:var(--c-brass-300)">{{ liQuoteSrc }}</div>
+          </sc-if>
+          <div style="position:absolute;left:20px;bottom:18px">
+            <div style="width:110px;height:28px;overflow:hidden;display:flex;align-items:center;justify-content:center"><x-import component-from-global-scope="VTMDesignSystem_e7f838.Logo" variant="white" height="110px" hint-size="110px,28px"></x-import></div>
+          </div>
+          <div style="position:absolute;right:20px;bottom:20px;font-family:var(--font-mono);font-size:0.5rem;letter-spacing:0.08em;color:rgb(255 255 255 / 0.5)">VERSICHERUNGSTECH-MAGAZIN.DE</div>
+        </div>
+        <div style="display:grid;gap:6px">
+          <label style="font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">TITELZEILE</label>
+          <input value="{{ imgTitle }}" onChange="{{ onImgTitle }}" style="min-height:42px;padding:0 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.86rem;background:var(--c-white)">
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="button button-primary" onClick="{{ onDownload }}">Bild herunterladen</button>
+          <span style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.06em;color:var(--text-muted)">{{ exportLabel }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section></sc-if>
+<sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}"><section data-screen-label="Einstellungen" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+  <header style="flex:none;display:flex;align-items:center;gap:12px;padding:18px 28px;background:var(--c-white);border-bottom:1px solid var(--border-soft)">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;color:var(--text-muted)">ADMINISTRATION / EINSTELLUNGEN</div>
+      <h1 style="margin:3px 0 0;font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-0.035em">Einstellungen</h1>
+    </div>
+  </header>
+  <div style="flex:1;overflow:auto;padding:22px 28px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1160px;align-items:start">
+      <div class="card" style="padding:20px 22px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <h3 style="flex:1;margin:0;font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-0.02em">Ghost-Verbindung</h3>
+          <span class="status status-good" style="min-height:22px;padding:0.14rem 0.5rem;font-size:0.56rem">Verbunden</span>
+        </div>
+        <div style="display:grid">
+          <div style="display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+            <span style="width:120px;flex:none;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.06em;color:var(--text-muted);padding-top:2px">SITE-URL</span>
+            <span style="font-family:var(--font-mono);font-size:0.74rem;color:var(--text-primary)">https://versicherungstech-magazin.de</span>
+          </div>
+          <div style="display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+            <span style="width:120px;flex:none;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.06em;color:var(--text-muted);padding-top:2px">ADMIN-API-KEY</span>
+            <span style="font-family:var(--font-mono);font-size:0.74rem;color:var(--text-primary)">••••••••••••9f2b</span>
+          </div>
+          <div style="display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+            <span style="width:120px;flex:none;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.06em;color:var(--text-muted);padding-top:2px">LETZTER ABGLEICH</span>
+            <span style="font-family:var(--font-mono);font-size:0.74rem;color:var(--text-primary)">24.07.2026, 13:58 · OK</span>
+          </div>
+        </div>
+        <div style="margin-top:14px"><button class="button button-secondary" onClick="{{ onTestGhost }}" style="min-height:36px;padding:0.35rem 0.8rem;font-size:0.82rem">Verbindung testen</button></div>
+      </div>
+      <div class="card" style="padding:20px 22px">
+        <h3 style="margin:0 0 14px;font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-0.02em">LinkedIn-Konten</h3>
+        <div style="display:grid">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border-soft)">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:0.86rem;font-weight:600">VersicherungsTech Magazin</div>
+              <div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.05em;color:var(--text-muted)">UNTERNEHMENSPROFIL · SIE-FORM</div>
+            </div>
+            <span class="status status-good" style="min-height:22px;padding:0.14rem 0.5rem;font-size:0.56rem">Verbunden</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border-soft)">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:0.86rem;font-weight:600">Max Brenner</div>
+              <div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.05em;color:var(--text-muted)">PERSÖNLICHES PROFIL · DU-FORM</div>
+            </div>
+            <span class="status status-good" style="min-height:22px;padding:0.14rem 0.5rem;font-size:0.56rem">Verbunden</span>
+          </div>
+        </div>
+        <div style="margin-top:14px"><button class="button button-quiet" onClick="{{ onAddAccount }}" style="min-height:36px;padding:0.35rem 0.8rem;font-size:0.82rem">Konto hinzufügen</button></div>
+      </div>
+      <div class="card" style="padding:20px 22px">
+        <h3 style="margin:0 0 14px;font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-0.02em">Brand-Assets</h3>
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <div style="display:grid;gap:4px;justify-items:center">
+            <span style="width:52px;height:36px;border-radius:4px;background:#121e39;border:1px solid var(--border-soft)"></span>
+            <span style="font-family:var(--font-mono);font-size:0.54rem;color:var(--text-muted)">#121E39</span>
+          </div>
+          <div style="display:grid;gap:4px;justify-items:center">
+            <span style="width:52px;height:36px;border-radius:4px;background:#123fa6;border:1px solid var(--border-soft)"></span>
+            <span style="font-family:var(--font-mono);font-size:0.54rem;color:var(--text-muted)">#123FA6</span>
+          </div>
+          <div style="display:grid;gap:4px;justify-items:center">
+            <span style="width:52px;height:36px;border-radius:4px;background:#c99b32;border:1px solid var(--border-soft)"></span>
+            <span style="font-family:var(--font-mono);font-size:0.54rem;color:var(--text-muted)">#C99B32</span>
+          </div>
+          <div style="display:grid;gap:4px;justify-items:center">
+            <span style="width:52px;height:36px;border-radius:4px;background:#fbfcfe;border:1px solid var(--border-medium)"></span>
+            <span style="font-family:var(--font-mono);font-size:0.54rem;color:var(--text-muted)">#FBFCFE</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border-soft);border-radius:4px;background:var(--c-white);margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <img src="assets/logos/vtm-icon-color.png" alt="VersicherungsTech Magazin" style="width:28px;height:28px;object-fit:contain" data-generation-allowed="false">
+            <span style="font-family:var(--font-display);font-size:0.9rem;font-weight:800;letter-spacing:-0.03em;color:var(--c-cobalt-950)">VersicherungsTech <span style="color:var(--c-blue-700)">Magazin</span></span>
+          </div>
+          <span style="flex:1"></span>
+          <span style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.06em;color:var(--text-muted)">WORTMARKE · MIN. 140 PX</span>
+        </div>
+        <div style="display:grid;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="flex:1;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;color:var(--text-muted)">APP-HINWEISBLOCK · SNIPPET</span>
+            <button class="button button-quiet" onClick="{{ onCopySnippet }}" style="min-height:28px;padding:0.15rem 0.5rem;font-size:0.72rem">Kopieren</button>
+          </div>
+          <pre style="margin:0;padding:12px 14px;background:var(--surface-dark);color:#dce8ff;border-radius:4px;font-family:var(--font-mono);font-size:0.66rem;line-height:1.65;overflow:auto">{{ snippet }}</pre>
+        </div>
+      </div>
+      <div style="display:grid;gap:18px">
+        <div class="card" style="padding:20px 22px">
+          <h3 style="margin:0 0 14px;font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-0.02em">Team und Rollen</h3>
+          <div style="display:grid">
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:1;font-size:0.86rem;font-weight:600">Max Brenner</span>
+              <span class="status status-mandatory" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.54rem">Herausgeber</span>
+              <span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-muted)">GHOST-PUBLISHING</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:1;font-size:0.86rem;font-weight:600">Julia Steiner</span>
+              <span class="status status-recommended" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.54rem">Redakteurin</span>
+              <span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-muted)">UPLOAD · REVIEW</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:1;font-size:0.86rem;font-weight:600">Tobias Frank</span>
+              <span class="status status-recommended" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.54rem">Redakteur</span>
+              <span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-muted)">UPLOAD · REVIEW</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:1;font-size:0.86rem;font-weight:600">L. Peters (d.velop)</span>
+              <span class="status status-optional" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.54rem">Kunde</span>
+              <span style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-muted)">NUR FREIGABELINK</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:20px 22px">
+          <h3 style="margin:0 0 14px;font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-0.02em">Redaktionsregeln</h3>
+          <div style="display:grid">
+            <div style="display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:none;font-family:var(--font-mono);font-size:0.6rem;font-weight:700;color:var(--c-blue-800);padding-top:2px">V4.2</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:0.82rem;line-height:1.55;color:var(--text-primary)">Genau ein CTA pro Artikel; Standardziel „AI Insurance Briefing abonnieren“. Em-Dashes sind unzulässig.</div>
+                <div style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.05em;color:var(--text-muted);margin-top:3px">12.07.2026 · MAX BRENNER</div>
+              </div>
+              <span class="status status-good" style="min-height:20px;padding:0.1rem 0.4rem;font-size:0.54rem;flex:none">Aktiv</span>
+            </div>
+            <div style="display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:none;font-family:var(--font-mono);font-size:0.6rem;font-weight:700;color:var(--text-muted);padding-top:2px">V4.1</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:0.82rem;line-height:1.55;color:var(--text-secondary)">Kernaussagen werden extrahiert und als „Belegt“, „Ableitung“ oder „Prognose“ klassifiziert; Quellenpflicht.</div>
+                <div style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.05em;color:var(--text-muted);margin-top:3px">28.05.2026 · MAX BRENNER</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--border-soft)">
+              <span style="flex:none;font-family:var(--font-mono);font-size:0.6rem;font-weight:700;color:var(--text-muted);padding-top:2px">V4.0</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:0.82rem;line-height:1.55;color:var(--text-secondary)">Sponsored Content: Kennzeichnung vor Titel und Teaser, Kundentext 1:1, keine redaktionelle Wertung.</div>
+                <div style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.05em;color:var(--text-muted);margin-top:3px">03.04.2026 · JULIA STEINER</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section></sc-if>
+<sc-if value="{{ isApproval }}" hint-placeholder-val="{{ false }}"><section data-screen-label="Sponsored-Freigabe" style="flex:1;overflow:auto;background:var(--c-paper)">
+  <div class="brand-rail"></div>
+  <header style="display:flex;align-items:center;gap:14px;padding:16px 32px;background:var(--c-white);border-bottom:1px solid var(--border-soft)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="assets/logos/vtm-icon-color.png" alt="VersicherungsTech Magazin" style="width:32px;height:32px;object-fit:contain" data-generation-allowed="false">
+      <span style="font-family:var(--font-display);font-size:1rem;font-weight:800;letter-spacing:-0.03em;color:var(--c-cobalt-950)">VersicherungsTech <span style="color:var(--c-blue-700)">Magazin</span></span>
+    </div>
+    <span style="flex:1"></span>
+    <span style="font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.08em;color:var(--text-muted)">SPONSORED-FREIGABE · GESICHERTER LINK · GÜLTIG BIS 31.07.2026</span>
+  </header>
+  <div style="max-width:880px;margin:0 auto;padding:32px 24px 48px;display:grid;gap:18px">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span class="tag tag-brass">Anzeige · Sponsored Content</span>
+        <span class="{{ apprBadgeCls }}">{{ apprBadgeLabel }}</span>
+      </div>
+      <h1 style="margin:0 0 8px;font-family:var(--font-display);font-size:1.6rem;font-weight:800;letter-spacing:-0.04em;line-height:1.15">Dunkelverarbeitung bei andsafe: Wie d.velop 82 % der Dokumente automatisiert</h1>
+      <div style="font-family:var(--font-mono);font-size:0.64rem;letter-spacing:0.05em;color:var(--text-muted)">D.VELOP · ANDSAFE · PRAXIS-CASE · ZUR FREIGABE SEIT 21.07.2026</div>
+    </div>
+    <ol class="workflow-steps">
+      <li class="workflow-approved">Entwurf</li>
+      <li class="workflow-approved">Aufbereitung</li>
+      <li>Kundenfreigabe</li>
+      <li>Publikation</li>
+    </ol>
+    <div class="card" style="padding:22px 24px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="flex:1;font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted)">ARTIKELVORSCHAU</span>
+        <button class="button button-quiet" onClick="{{ onPreviewFull }}" style="min-height:30px;padding:0.2rem 0.55rem;font-size:0.76rem">Vollständige Vorschau öffnen</button>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;color:var(--c-blue-800);margin-bottom:8px">SPONSORED CONTENT / PRAXIS-CASE</div>
+      <p style="margin:0 0 12px;font-size:0.95rem;font-weight:600;line-height:1.6;color:var(--text-primary)">Der Gewerbeversicherer andsafe verarbeitet 82 % der eingehenden Dokumente ohne manuellen Eingriff. Der Praxis-Case dokumentiert Architektur, Einführung und Grenzen des Projekts mit d.velop.</p>
+      <ul style="margin:0;padding-left:18px;display:grid;gap:6px">
+        <li style="font-size:0.86rem;line-height:1.55;color:var(--text-secondary)">andsafe verarbeitet 82 % der eingehenden Dokumente vollautomatisch (Dunkelverarbeitung).</li>
+        <li style="font-size:0.86rem;line-height:1.55;color:var(--text-secondary)">Die Einführung gelang in neun Monaten ohne Ausbau des Serviceteams.</li>
+        <li style="font-size:0.86rem;line-height:1.55;color:var(--text-secondary)">Komplexe Schadenfälle bleiben bewusst in der manuellen Bearbeitung.</li>
+      </ul>
+    </div>
+    <div class="card" style="padding:22px 24px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <h3 style="flex:1;margin:0;font-family:var(--font-display);font-size:1rem;font-weight:700;letter-spacing:-0.02em">Ihr Text / Unsere Umsetzung</h3>
+        <span class="status status-good" style="min-height:22px;padding:0.14rem 0.5rem;font-size:0.56rem">Text 1:1 übernommen</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="padding:14px 16px;border:1px solid var(--border-soft);border-radius:4px;background:var(--c-paper-blue)">
+          <div style="font-family:var(--font-mono);font-size:0.56rem;font-weight:700;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:8px">IHR TEXT (MANUSKRIPT)</div>
+          <p style="margin:0;font-size:0.84rem;line-height:1.65;color:var(--text-secondary)">andsafe verarbeitet heute 82 % der eingehenden Dokumente vollautomatisch. Gemeinsam mit d.velop wurde die Dunkelverarbeitung in neun Monaten eingeführt, ohne das Serviceteam auszubauen. Komplexe Schadenfälle bleiben bewusst in der manuellen Bearbeitung.</p>
+        </div>
+        <div style="padding:14px 16px;border:1px solid var(--border-electric);border-radius:4px;background:var(--c-white)">
+          <div style="font-family:var(--font-mono);font-size:0.56rem;font-weight:700;letter-spacing:0.1em;color:var(--c-blue-800);margin-bottom:8px">UNSERE UMSETZUNG</div>
+          <p style="margin:0 0 10px;font-size:0.84rem;line-height:1.65;color:var(--text-secondary)">andsafe verarbeitet heute 82 % der eingehenden Dokumente vollautomatisch. Gemeinsam mit d.velop wurde die Dunkelverarbeitung in neun Monaten eingeführt, ohne das Serviceteam auszubauen. Komplexe Schadenfälle bleiben bewusst in der manuellen Bearbeitung.</p>
+          <div style="display:grid;gap:4px">
+            <span style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.04em;color:var(--c-blue-700)">+ ZWISCHENÜBERSCHRIFTEN ERGÄNZT (4)</span>
+            <span style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.04em;color:var(--c-blue-700)">+ „DAS WICHTIGSTE“ UND CTA ERGÄNZT</span>
+            <span style="font-family:var(--font-mono);font-size:0.56rem;letter-spacing:0.04em;color:var(--c-blue-700)">+ KENNZEICHNUNG „ANZEIGE“ VOR TITEL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="padding:22px 24px">
+      <div style="font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:12px">IHRE RÜCKMELDUNG</div>
+      <sc-if value="{{ apprPending }}" hint-placeholder-val="{{ true }}">
+        <textarea value="{{ comment }}" onChange="{{ onComment }}" rows="3" placeholder="Optionaler Kommentar, bei Änderungswünschen bitte konkret beschreiben …" style="width:100%;padding:10px 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.86rem;line-height:1.6;background:var(--c-white);resize:vertical"></textarea>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="button button-primary" onClick="{{ onApprove }}">Freigeben</button>
+          <button class="button button-secondary" onClick="{{ onReqChange }}">Änderung anfragen</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ apprDecided }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border-soft);border-radius:4px;background:var(--c-paper-blue)">
+          <span class="{{ apprBadgeCls }}">{{ apprBadgeLabel }}</span>
+          <span style="font-size:0.84rem;line-height:1.55;color:var(--text-secondary)">{{ apprDoneNote }}</span>
+        </div>
+      </sc-if>
+    </div>
+    <div class="card" style="padding:22px 24px">
+      <div style="font-family:var(--font-mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:8px">STATUSVERLAUF</div>
+      <div style="display:grid">
+        <sc-for list="{{ history }}" as="h" hint-placeholder-count="3">
+          <div style="display:flex;gap:14px;padding:10px 0;border-top:1px solid var(--border-soft)">
+            <span style="flex:none;font-family:var(--font-mono);font-size:0.64rem;font-weight:600;color:var(--c-blue-800);padding-top:1px">{{ h.d }}</span>
+            <span style="font-size:0.84rem;line-height:1.55;color:var(--text-secondary)">{{ h.t }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div><button class="button button-quiet" onClick="{{ backToStudio }}" style="min-height:34px;padding:0.3rem 0.6rem;font-size:0.78rem">← Zurück zum Studio (Demo-Navigation)</button></div>
+  </div>
+</section></sc-if>
+</main>
+<sc-if value="{{ ghostOpen }}" hint-placeholder-val="{{ false }}"><div style="position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgb(8 13 24 / 0.55);padding:24px;animation:vtm-fade 160ms ease">
+  <div data-screen-label="Ghost-Modal" style="width:min(680px,100%);max-height:calc(100vh - 48px);overflow:auto;background:var(--c-white);border:1px solid var(--border-medium);border-radius:8px;box-shadow:var(--shadow-medium)">
+    <sc-if value="{{ ghostForm }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:10px;padding:20px 24px 0">
+        <div style="flex:1">
+          <div style="font-family:var(--font-mono);font-size:0.58rem;font-weight:600;letter-spacing:0.12em;color:var(--text-muted)">GHOST CMS / ÜBERTRAGUNG</div>
+          <h2 style="margin:4px 0 0;font-family:var(--font-display);font-size:1.25rem;font-weight:800;letter-spacing:-0.03em">Nach Ghost übertragen</h2>
+        </div>
+        <span class="status status-good" style="min-height:22px;padding:0.14rem 0.5rem;font-size:0.56rem">Verbunden</span>
+      </div>
+      <div style="display:grid;gap:18px;padding:20px 24px">
+        <div style="display:grid;gap:7px">
+          <label style="font-size:0.8rem;font-weight:700">Headline</label>
+          <input value="{{ headline }}" onChange="{{ onHeadline }}" style="min-height:44px;padding:0 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.9rem;font-weight:600;background:var(--c-white)">
+          <div style="display:grid;gap:5px;margin-top:2px">
+            <sc-for list="{{ suggChips }}" as="sg" hint-placeholder-count="2">
+              <button onClick="{{ sg.onPick }}" style="display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;padding:8px 10px;border:1px dashed var(--border-medium);border-radius:4px;background:var(--c-paper);cursor:pointer">
+                <span style="flex:none;font-family:var(--font-mono);font-size:0.54rem;font-weight:700;letter-spacing:0.08em;color:var(--c-blue-700)">KI-VORSCHLAG</span>
+                <span style="font-size:0.8rem;line-height:1.45;color:var(--text-secondary)">{{ sg.text }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;gap:7px">
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <label style="flex:1;font-size:0.8rem;font-weight:700">Excerpt</label>
+            <span style="{{ exCountStyle }}">{{ exCount }}</span>
+          </div>
+          <textarea value="{{ excerpt }}" onChange="{{ onExcerpt }}" rows="4" style="padding:10px 12px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;line-height:1.6;background:var(--c-white);resize:vertical"></textarea>
+          <sc-if value="{{ exOver }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;display:flex;align-items:baseline;gap:6px;color:var(--c-danger);font-size:0.76rem;font-weight:600">Limit von 300 Zeichen überschritten. Ghost kürzt den Excerpt sonst automatisch.</p>
+          </sc-if>
+          <div style="display:flex;gap:6px;margin-top:2px">
+            <sc-for list="{{ exChips }}" as="ex" hint-placeholder-count="3"><button style="{{ ex.style }}" onClick="{{ ex.onPick }}">{{ ex.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="display:grid;gap:7px;align-content:start">
+            <label style="font-size:0.8rem;font-weight:700">Tags</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ ghostTags }}" as="tg" hint-placeholder-count="4"><span class="tag" style="min-height:24px;padding:0.14rem 0.45rem;font-size:0.58rem">{{ tg }}</span></sc-for>
+            </div>
+          </div>
+          <div style="display:grid;gap:7px;align-content:start">
+            <label style="font-size:0.8rem;font-weight:700">Status</label>
+            <select style="min-height:42px;padding:0 10px;border:1px solid var(--c-neutral-300);border-radius:4px;font-size:0.84rem;background:var(--c-white);cursor:pointer">
+              <option>Draft</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;gap:7px">
+          <label style="font-size:0.8rem;font-weight:700">Feature-Image</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <sc-for list="{{ imgOpts }}" as="io" hint-placeholder-count="3">
+              <div style="display:grid;gap:5px">
+                <button style="{{ io.style }}" onClick="{{ io.onPick }}" aria-label="{{ io.label }}"></button>
+                <span style="{{ io.labelStyle }}">{{ io.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border-soft);background:var(--c-paper)">
+        <button class="button button-quiet" onClick="{{ closeGhost }}">Abbrechen</button>
+        <button class="button button-primary" onClick="{{ onCreateDraft }}">Draft erstellen</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ ghostDone }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;justify-items:center;gap:12px;padding:44px 32px 36px;text-align:center">
+        <span style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--c-success-bg);border:1px solid rgb(23 102 58 / 0.24)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-success)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 7"></path></svg>
+        </span>
+        <h2 style="margin:0;font-family:var(--font-display);font-size:1.3rem;font-weight:800;letter-spacing:-0.03em">Draft in Ghost erstellt</h2>
+        <div style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.05em;color:var(--text-muted)">ID 65F2-A417 · STATUS: DRAFT · 24.07.2026, 14:32</div>
+        <p style="margin:0;max-width:400px;font-size:0.86rem;line-height:1.6;color:var(--text-secondary)">Der Artikel liegt als Draft im Ghost CMS. Feature-Image, Tags und Excerpt wurden übernommen; die Pipeline-Karte wurde auf „In Ghost“ verschoben.</p>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <a href="#" onClick="{{ onOpenGhostLink }}" class="button button-primary">Draft in Ghost öffnen</a>
+          <button class="button button-quiet" onClick="{{ closeGhost }}">Schließen</button>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</div></sc-if>
+<sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;right:22px;bottom:22px;z-index:80;display:flex;align-items:center;gap:10px;max-width:440px;padding:12px 16px;background:var(--c-white);border:1px solid var(--border-medium);border-left:3px solid var(--c-blue-700);border-radius:4px;box-shadow:var(--shadow-medium);font-size:0.86rem;animation:vtm-toast-in 180ms var(--ease-signal)">{{ toastMsg }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Herausgeber&quot;,&quot;Redakteur&quot;],&quot;default&quot;:&quot;Herausgeber&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo-Zustände&quot;},&quot;emptyPipeline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Demo-Zustände&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Pipeline&quot;,&quot;Neuer Artikel&quot;,&quot;Artikel-Review&quot;,&quot;LinkedIn Studio&quot;,&quot;Einstellungen&quot;,&quot;Sponsored-Freigabe&quot;],&quot;default&quot;:&quot;Pipeline&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo-Zustände&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.C = 213.628;
+    this.COLS = [["eingegangen","Eingegangen",""],["aufbereitung","In Aufbereitung",""],["review","Review",""],["kundenfreigabe","Kundenfreigabe","nur Sponsored"],["bereit","Bereit",""],["ghost","In Ghost",""]];
+    this.ARTS = [
+      {id:"a1",title:"Neodigital gibt die BaFin-Lizenz zurück",format:"Analyse",author:"Max Brenner",col:"review",score:14,checks:[["warn","Stilcheck: 2 Verstöße"],["good","Faktencheck OK"],["good","Struktur vollständig"]]},
+      {id:"a2",title:"Wie sicher ist Microsoft Copilot? Eine Einordnung für IT-Security-Teams",format:"Einordnung",author:"Julia Steiner",col:"aufbereitung",score:null,checks:[["off","Stilcheck ausstehend"],["off","Faktencheck ausstehend"],["good","Struktur erkannt"]]},
+      {id:"a3",title:"Dunkelverarbeitung bei andsafe: Wie d.velop 82 % der Dokumente automatisiert",format:"Sponsored",author:"d.velop / Redaktion",col:"kundenfreigabe",score:15,sponsor:"d.velop",checks:[["good","Stilcheck OK"],["good","Faktencheck OK"],["good","Struktur vollständig"]]},
+      {id:"a4",title:"EU AI Act: Was Versicherer bis August 2026 geregelt haben müssen",format:"Leitfaden",author:"Tobias Frank",col:"eingegangen",score:null,checks:[["off","Stilcheck ausstehend"],["off","Faktencheck ausstehend"],["off","Struktur ausstehend"]]},
+      {id:"a5",title:"Guidewire-Migration bei der Provinzial: 14 Monate, drei Lehren",format:"Praxis-Case",author:"Julia Steiner",col:"bereit",score:15,checks:[["good","Stilcheck OK"],["good","Faktencheck OK"],["good","Struktur vollständig"]]},
+      {id:"a6",title:"Cloud-Exit-Klauseln: Warum die BaFin genauer hinschaut",format:"Analyse",author:"Max Brenner",col:"ghost",score:14,checks:[["good","Stilcheck OK"],["good","Faktencheck OK"],["good","Struktur vollständig"]]}
+    ];
+    this.RV = {
+      a1:{title:"Neodigital gibt die BaFin-Lizenz zurück",kategorie:"MARKT & STRATEGIE / ANALYSE",imgTitle:"Das Lizenz-Aus bei Neodigital",
+        lead:"Sechs Jahre nach dem Start zieht sich Neodigital als Risikoträger zurück. Der Schritt sagt weniger über den Versicherer aus als über die Ökonomie kleiner Lizenzen.",
+        wichtigste:["Neodigital gibt die BaFin-Lizenz zurück und wird reiner Technologieanbieter.","Das eigene Lizenzmodell rechnet sich nach VTM-Berechnung erst ab rund 500.000 Policen.","Für Makler und Partner stehen Migrationen von Beständen und BiPRO-Anbindungen an."],
+        sections:[
+          {h2:"Was der Rückzug konkret bedeutet",text:"Neodigital hat die Erlaubnis zum Betrieb des Versicherungsgeschäfts Ende Juni 2026 an die BaFin zurückgegeben. Die rund 240.000 Bestandspolicen laufen über einen etablierten Risikoträger weiter, die Marke bleibt als Technologieplattform bestehen."},
+          {h2:"Warum das Lizenzmodell nicht trug",text:"Kapitalanforderungen, Meldewesen und Aktuariat kosten einen Risikoträger unabhängig von der Bestandsgröße einen mittleren einstelligen Millionenbetrag pro Jahr. Nach VTM-Berechnung rechnet sich das Modell erst ab rund 500.000 Policen, Neodigital erreichte weniger als die Hälfte."},
+          {h2:"Die Folgen für Partner und Vertriebe",text:"Für angebundene Makler ändern sich Risikoträger, BiPRO-Endpunkte und Dokumentenprozesse. Die Migration soll bis zum ersten Quartal 2027 abgeschlossen sein; ein Parallelbetrieb beider Systeme ist nicht vorgesehen."},
+          {h2:"Was etablierte Versicherer daraus lernen",text:"Der Rückzug öffnet ein Fenster: Erprobte Technologie sucht Risikoträger mit Skalen. Wer Kooperationen jetzt prüft, verhandelt aus einer stärkeren Position als in zwei Jahren."}],
+        gegen:"Der Rückzug taugt nur bedingt als Beleg gegen digitale Geschäftsmodelle: Neodigital bleibt als Technologieanbieter aktiv und arbeitet in diesem Segment nach eigenen Angaben profitabel. Ob sich das Muster auf andere Neoversicherer übertragen lässt, bleibt offen.",
+        wert:"Der Schritt ist konsequent. Gescheitert ist nicht die Technologie, sondern die Annahme, dass eine eigene Lizenz der schnellste Weg zur Skalierung ist.",
+        todo:["Kooperationsoptionen mit frei werdenden Technologieanbietern bewerten, bevor Wettbewerber Kapazitäten binden.","Eigene Bestandsmigrationen auf BiPRO-Kompatibilität und Dokumentenprozesse prüfen.","Make-or-Buy-Entscheidungen für Kernsysteme mit realistischen Skalenschwellen unterlegen."],
+        fazit:"Neodigital beendet nicht die Digitalisierung der Branche, sondern ein Finanzierungsmodell dafür. Wer Technologie und Risiko trennt, kann aus dem Rückzug ein Angebot machen.",
+        quellen:["BaFin-Unternehmensdatenbank, Abruf 22.07.2026","Pressemitteilung Neodigital, 30.06.2026","VTM-Gespräche mit zwei Marktteilnehmern, Juli 2026"],
+        cta:"AI Insurance Briefing abonnieren",
+        quality:[["Relevanz",2],["Kernaussage",2],["Belege",2],["Leserführung",1],["Praxisnutzen",2],["Differenzierung",2],["Sprache",1],["Abschluss",2]],
+        findings:[
+          {kind:"error",rule:"EM-DASH",text:"Gedankenstrich (—) in Abschnitt „Warum das Lizenzmodell nicht trug“. Durch Komma oder Doppelpunkt ersetzen.",target:"pv-s1"},
+          {kind:"error",rule:"BUZZWORD",text:"„disruptiv“ im Lead ist eine Behauptung ohne Beleg. Durch konkrete Aussage ersetzen.",target:"pv-lead"},
+          {kind:"ok",rule:"ZAHLENFORMAT",text:"Prozent- und Zahlenformate entsprechen dem VTM-Standard („18 %“, geschütztes Leerzeichen)."},
+          {kind:"ok",rule:"STRUKTUR",text:"Alle Pflichtelemente vorhanden, genau ein CTA."}],
+        claims:[
+          {text:"Neodigital hat die BaFin-Lizenz Ende Juni 2026 zurückgegeben.",k:"b",badge:"Belegt (BaFin-Register)",src:"bafin.de/unternehmensdatenbank"},
+          {text:"Rund 240.000 Bestandspolicen wechseln zu einem etablierten Risikoträger.",k:"b",badge:"Belegt (Pressemitteilung)",src:"neodigital.de/presse"},
+          {text:"Das eigene Lizenzmodell rechnet sich erst ab rund 500.000 Policen.",k:"a",badge:"Ableitung, gekennzeichnet",src:"VTM-Berechnung, Methodik im Text"},
+          {text:"Weitere Neoversicherer dürften ihre Lizenz zur Disposition stellen.",k:"p",badge:"Prognose, konditionalisiert",src:"Konjunktiv im Text geprüft"}],
+        diff:[["Handelsblatt","Meldung, 22.07.",true],["Versicherungsmonitor","Kommentar, 23.07.",true],["vwheute","bisher kein Beitrag",false]],
+        diffNote:"Empfohlener VTM-Winkel: die Ökonomie kleiner Lizenzen und die Folgen für BiPRO-Anbindungen der Partner. Die Chronik des Rückzugs ist bereits besetzt.",
+        sugg:["Neodigital gibt die BaFin-Lizenz zurück: Das Ende eines Finanzierungsmodells","Lizenz-Aus bei Neodigital: Warum sich kleine Risikoträger nicht rechnen"],
+        excerpts:[
+          "Neodigital gibt die BaFin-Lizenz zurück und wird reiner Technologieanbieter. Die Analyse zeigt, warum sich kleine Lizenzen erst ab rund 500.000 Policen rechnen und was der Rückzug für Makler, Partner und etablierte Versicherer bedeutet.",
+          "Sechs Jahre nach dem Start beendet Neodigital sein Risikoträgergeschäft. Was der Schritt über die Ökonomie kleiner Lizenzen verrät und welche Kooperationsfenster sich für etablierte Versicherer öffnen.",
+          "Neodigital hat die Erlaubnis zum Betrieb des Versicherungsgeschäfts an die BaFin zurückgegeben. Rund 240.000 Policen wechseln zu einem etablierten Risikoträger, die Technologieplattform bleibt am Markt. Die VTM-Analyse rechnet nach, warum das Lizenzmodell nicht trug, und ordnet ein, was jetzt auf Makler, Partner und Wettbewerber zukommt."],
+        tags:["analyse","insurtech","bafin","neodigital"]},
+      a3:{title:"Dunkelverarbeitung bei andsafe: Wie d.velop 82 % der Dokumente automatisiert",sponsored:true,client:"d.velop",kategorie:"SPONSORED CONTENT / PRAXIS-CASE",imgTitle:"Dunkelverarbeitung: 82 % ohne manuellen Eingriff",
+        lead:"Der Gewerbeversicherer andsafe verarbeitet 82 % der eingehenden Dokumente ohne manuellen Eingriff. Der Praxis-Case dokumentiert Architektur, Einführung und Grenzen des Projekts mit d.velop.",
+        wichtigste:["andsafe verarbeitet 82 % der eingehenden Dokumente vollautomatisch (Dunkelverarbeitung).","Die Einführung gelang in neun Monaten ohne Ausbau des Serviceteams.","Komplexe Schadenfälle bleiben bewusst in der manuellen Bearbeitung."],
+        sections:[
+          {h2:"Ausgangslage: 40.000 Dokumente im Monat",text:"Als Digitalversicherer der Provinzial wächst andsafe im Gewerbegeschäft zweistellig. Mit dem Bestand wuchs der Dokumenteneingang auf rund 40.000 Stück pro Monat, klassisch nicht mehr zu bewältigen."},
+          {h2:"Die Architektur der Dunkelverarbeitung",text:"Eingehende Dokumente werden klassifiziert, ausgelesen und regelbasiert dem Bestands- oder Schadensystem zugeordnet. Nur Fälle unterhalb definierter Konfidenzwerte gehen in die manuelle Klärung."},
+          {h2:"Einführung in neun Monaten",text:"Das Projekt startete mit den fünf häufigsten Dokumenttypen und erweiterte den Automatisierungsgrad in zweiwöchigen Iterationen. Nach neun Monaten lag die Dunkelverarbeitungsquote bei 82 %."},
+          {h2:"Grenzen und offene Punkte",text:"Komplexe Schadenmeldungen und Vollmachten bleiben in der manuellen Bearbeitung. Die Quote ist eine Momentaufnahme; ob sie bei neuen Produktlinien hält, wird sich zeigen."}],
+        gegen:"",wert:"",
+        todo:["Dokumenteneingang nach Typen und Volumen vermessen, bevor Automatisierungsziele gesetzt werden.","Konfidenzschwellen mit dem Fachbereich definieren, nicht allein mit der IT.","Dunkelverarbeitung als Produkt mit Iterationen planen, nicht als einmaliges Projekt."],
+        fazit:"Der Fall andsafe zeigt: Dunkelverarbeitung trägt im Gewerbegeschäft, wenn Dokumenttypen priorisiert und Grenzen bewusst gesetzt werden.",
+        quellen:["Projektdaten d.velop / andsafe, Stand Juni 2026 (Kundenangaben)","Gespräch mit dem Serviceleiter andsafe, 08.07.2026"],
+        cta:"AI Insurance Briefing abonnieren",
+        quality:[["Relevanz",2],["Kernaussage",2],["Belege",2],["Leserführung",2],["Praxisnutzen",2],["Differenzierung",1],["Sprache",2],["Abschluss",2]],
+        findings:[
+          {kind:"ok",rule:"STILREGELN",text:"Keine Verstöße gefunden. Kundentext wurde 1:1 übernommen, Strukturelemente ergänzt."},
+          {kind:"ok",rule:"KENNZEICHNUNG",text:"„Anzeige“ steht vor Titel und Teaser, Sponsor ist benannt."}],
+        claims:[
+          {text:"82 % der eingehenden Dokumente werden ohne manuellen Eingriff verarbeitet.",k:"b",badge:"Belegt (Kundenangabe)",src:"Projektdaten d.velop, 06/2026"},
+          {text:"Die Einführung dauerte neun Monate.",k:"b",badge:"Belegt (Kundenangabe)",src:"Projektplan andsafe"},
+          {text:"Die Quote lässt sich auf neue Produktlinien übertragen.",k:"p",badge:"Prognose, konditionalisiert",src:"Konjunktiv im Text geprüft"}],
+        diff:[["Handelsblatt","kein Beitrag",false],["Versicherungsmonitor","kein Beitrag",false],["vwheute","Produktmeldung, 04/2026",true]],
+        diffNote:"Sponsored Content: Differenzierung über dokumentierte Projektdaten und benannte Grenzen statt redaktioneller Wertung.",
+        sugg:["Dunkelverarbeitung bei andsafe: 82 % ohne manuellen Eingriff","Praxis-Case andsafe: Was Dunkelverarbeitung im Gewerbegeschäft leistet"],
+        excerpts:[
+          "Der Gewerbeversicherer andsafe verarbeitet 82 % der eingehenden Dokumente vollautomatisch. Der Praxis-Case mit d.velop dokumentiert Architektur, Einführungsweg und die bewusst gesetzten Grenzen der Dunkelverarbeitung.",
+          "andsafe hat den Dokumenteneingang von 40.000 Stück pro Monat weitgehend automatisiert. Wie die Architektur aussieht, warum das Projekt neun Monate brauchte und wo die Dunkelverarbeitung endet.",
+          "Sponsored Content: Gemeinsam mit d.velop zeigt andsafe, wie Dunkelverarbeitung im Gewerbegeschäft produktiv wird. Mit Projektdaten, Architekturskizze und einer ehrlichen Liste offener Punkte."],
+        tags:["sponsored","praxis-case","dokumentenmanagement","d.velop"]},
+      a5:{title:"Guidewire-Migration bei der Provinzial: 14 Monate, drei Lehren",kategorie:"IT-PRAXIS / PRAXIS-CASE",imgTitle:"Guidewire-Migration: drei Lehren",
+        lead:"Die Provinzial hat die Schaden-Kernsysteme in 14 Monaten auf Guidewire migriert. Drei Entscheidungen haben das Projekt getragen, eine hätte es fast gestoppt.",
+        wichtigste:["Die Migration der Schadensysteme gelang in 14 Monaten und damit im Plan.","Der Verzicht auf Individualanpassungen war die wichtigste Einzelentscheidung.","Die Datenmigration band mehr Kapazität als Integration und Schulung zusammen."],
+        sections:[
+          {h2:"Der Zuschnitt des Projekts",text:"Migriert wurden Schaden und Leistungsmanagement, nicht der Bestand. Der bewusst kleine Zuschnitt hielt das Projekt steuerbar."},
+          {h2:"Drei Lehren aus 14 Monaten",text:"Standard vor Individualisierung, Datenqualität vor Funktionsumfang, Schulung vor Go-live. Die Details und Kennzahlen im Text."},
+          {h2:"Was offen bleibt",text:"Die Bestandsmigration steht noch aus; ob der Standardansatz dort trägt, ist offen."}],
+        gegen:"Ein 14-Monats-Projekt mit kleinem Zuschnitt taugt nur begrenzt als Maßstab für Vollmigrationen.",
+        wert:"Der Fall zeigt, dass Disziplin im Zuschnitt mehr bewirkt als die Werkzeugwahl.",
+        todo:["Projektzuschnitt vor Anbieterwahl festlegen.","Datenqualität früh messen und budgetieren.","Individualanforderungen einzeln rechtfertigen lassen."],
+        fazit:"Nicht das Werkzeug entscheidet, sondern der Zuschnitt.",
+        quellen:["Projektbericht Provinzial, Juni 2026","VTM-Interview mit der Programmleitung, 02.07.2026"],
+        cta:"AI Insurance Briefing abonnieren",
+        quality:[["Relevanz",2],["Kernaussage",2],["Belege",2],["Leserführung",2],["Praxisnutzen",2],["Differenzierung",2],["Sprache",2],["Abschluss",1]],
+        findings:[{kind:"ok",rule:"STILREGELN",text:"Keine Verstöße gefunden."}],
+        claims:[
+          {text:"Die Migration dauerte 14 Monate.",k:"b",badge:"Belegt (Projektbericht)",src:"Projektbericht Provinzial"},
+          {text:"Der Standardansatz trägt auch die Bestandsmigration.",k:"p",badge:"Prognose, konditionalisiert",src:"Konjunktiv im Text geprüft"}],
+        diff:[["Handelsblatt","kein Beitrag",false],["Versicherungsmonitor","kein Beitrag",false],["vwheute","kein Beitrag",false]],
+        diffNote:"Thema ist frei. Empfohlener VTM-Winkel: Kennzahlen und Lehren statt Erfolgsmeldung.",
+        sugg:["Guidewire bei der Provinzial: 14 Monate, drei Lehren","Kernsystem-Migration: Was die Provinzial richtig gemacht hat"],
+        excerpts:[
+          "Die Provinzial hat ihre Schaden-Kernsysteme in 14 Monaten auf Guidewire migriert. Der Praxis-Case nennt die drei Entscheidungen, die das Projekt getragen haben, und die eine, die es fast gestoppt hätte.",
+          "14 Monate, im Plan, ohne Individualwildwuchs: Die Guidewire-Migration der Provinzial ist ein Lehrstück für Projektzuschnitt. Die Kennzahlen und Lehren im Praxis-Case.",
+          "Standard vor Individualisierung, Datenqualität vor Funktionsumfang, Schulung vor Go-live: Der Praxis-Case zur Guidewire-Migration der Provinzial mit allen Kennzahlen."],
+        tags:["praxis-case","kernsysteme","guidewire","provinzial"]}
+    };
+    this.LI = {
+      a1:{corp:[
+        "Neodigital gibt die BaFin-Lizenz zurück. Das sagt weniger über den Versicherer aus als über die Ökonomie kleiner Lizenzen.\n\nSechs Jahre nach dem Start zieht sich der Neoversicherer aus dem Risikoträgergeschäft zurück. Die Bestände laufen bei einem Partner weiter, das Unternehmen konzentriert sich auf sein Technologiegeschäft.\n\n▪ Das eigene Lizenzmodell rechnet sich nach VTM-Berechnung erst ab rund 500.000 Policen.\n▪ Für Makler und Partner stehen Migrationen von Beständen und BiPRO-Anbindungen an.\n▪ Für etablierte Versicherer öffnet sich ein Fenster für Kooperationen mit erprobter Technik.\n\nJetzt lesen und mitdiskutieren.\n\n#InsurTech #BaFin #Neodigital #Versicherungswirtschaft #DigitaleTransformation",
+        "Eine BaFin-Lizenz ist kein Geschäftsmodell. Neodigital zieht die Konsequenz und gibt sie zurück.\n\nDie Analyse zeigt: Kapitalanforderungen, Meldewesen und Aktuariat tragen sich erst ab einer Skalenschwelle, die kaum ein Neoversicherer erreicht.\n\n▪ Rund 240.000 Bestandspolicen wechseln zu einem etablierten Risikoträger.\n▪ Die Technologieplattform von Neodigital bleibt am Markt und arbeitet profitabel.\n▪ Die Trennung von Risiko und Technologie wird zum Muster der nächsten Konsolidierungswelle.\n\nJetzt lesen und mitdiskutieren.\n\n#Versicherung #InsurTech #BaFin #Kernsysteme #Transformation"],
+      pers:[
+        "Neodigital gibt die BaFin-Lizenz zurück. Ich habe lange gedacht, dass dieses Modell trägt. Es trägt nicht.\n\nNicht, weil die Technik schlecht wäre. Sondern weil eine eigene Lizenz erst ab rund 500.000 Policen wirtschaftlich wird. So ehrlich muss man rechnen.\n\nWenn Du bei einem Versicherer für Architektur oder Partnerschaften zuständig bist: Schau Dir jetzt an, welche Technologieanbieter frei werden. Solche Fenster bleiben nicht lange offen.\n\nDie ganze Analyse findest Du im VersicherungsTech Magazin.\n\n#InsurTech #Versicherung #BaFin",
+        "Was mich am Rückzug von Neodigital überrascht, ist nicht die Entscheidung. Es ist der Zeitpunkt.\n\nMitten in der stärksten Nachfrage nach Bestandsmigrationen gibt der bekannteste Neoversicherer seine Lizenz zurück und wird reiner Technologieanbieter.\n\nMeine Einschätzung: Das ist kein Scheitern, das ist die Blaupause. Risiko und Technologie gehören in getrennte Bilanzen.\n\nWie siehst Du das? Die Analyse ist im Profil verlinkt.\n\n#Neodigital #InsurTech #Versicherungswirtschaft"]},
+      a3:{corp:[
+        "82 % der eingehenden Dokumente ohne manuellen Eingriff: Der Gewerbeversicherer andsafe zeigt, wie weit Dunkelverarbeitung heute trägt.\n\nIm Praxis-Case mit d.velop dokumentieren wir Architektur, Einführung und Grenzen des Projekts.\n\n▪ Rund 40.000 Dokumente pro Monat durchlaufen die automatisierte Klassifikation.\n▪ Die Einführung gelang in neun Monaten ohne Ausbau des Serviceteams.\n▪ Komplexe Schadenfälle bleiben bewusst in der manuellen Bearbeitung.\n\nJetzt lesen und mitdiskutieren.\n\nAnzeige · In Kooperation mit d.velop\n\n#Dunkelverarbeitung #Gewerbeversicherung #Dokumentenmanagement #InsurTech #Automatisierung",
+        "Neun Monate, fünf Dokumenttypen zum Start, 82 % Dunkelverarbeitung: Der Praxis-Case von andsafe und d.velop zeigt den Weg im Detail.\n\n▪ Die Architektur ordnet Dokumente regelbasiert dem Bestands- oder Schadensystem zu.\n▪ Konfidenzschwellen entscheiden, was in die manuelle Klärung geht.\n▪ Das Serviceteam wuchs trotz zweistelligen Bestandswachstums nicht.\n\nJetzt lesen und mitdiskutieren.\n\nAnzeige · In Kooperation mit d.velop\n\n#Dunkelverarbeitung #InsurTech #Gewerbeversicherung #Dokumentenmanagement #Automatisierung"],
+      pers:[
+        "82 % Dunkelverarbeitung im Gewerbegeschäft. Als mir andsafe die Zahl genannt hat, wollte ich erst die Definition sehen.\n\nDie Definition hält. Gemessen wird der Anteil der Dokumente, die ohne jeden manuellen Eingriff im Zielsystem landen. Rund 40.000 Stück im Monat.\n\nWas mich überzeugt: Das Projekt benennt seine Grenzen selbst. Komplexe Schäden bleiben bewusst beim Menschen.\n\nDen ganzen Praxis-Case findest Du im VersicherungsTech Magazin (Anzeige, in Kooperation mit d.velop).\n\n#Dunkelverarbeitung #InsurTech #Automatisierung",
+        "Neun Monate von null auf 82 % Dunkelverarbeitung. Die ehrlichste Zahl in diesem Praxis-Case ist aber eine andere.\n\nEs ist die Liste der Dokumenttypen, die andsafe bewusst NICHT automatisiert. Wer Automatisierung ernst meint, definiert zuerst, wo sie endet.\n\nWie handhabst Du das in Deinen Projekten? Der Case ist im Profil verlinkt (Anzeige, in Kooperation mit d.velop).\n\n#Gewerbeversicherung #Dokumentenmanagement #Automatisierung"]}
+    };
+    const sm = {"Pipeline":"pipeline","Neuer Artikel":"new","Artikel-Review":"review","LinkedIn Studio":"linkedin","Einstellungen":"settings","Sponsored-Freigabe":"approval"};
+    this.state = {
+      screen:sm[props.startScreen]||"pipeline",
+      role:props.role||"Herausgeber",
+      articles:(props.emptyPipeline?[]:this.ARTS),
+      search:"",filter:"alle",
+      file:null,spon:false,client:"",kategorie:"KI & Automatisierung",artFormat:"Analyse",frage:"",anlass:"",cta:"AI Insurance Briefing abonnieren",processing:false,step:-1,
+      curId:"a1",view:"web",device:"desktop",tab:"q",activeSec:"pv-kat",
+      ghostOpen:false,ghostDone:false,headline:"",excerpt:"",exVar:0,ghostImg:0,
+      liArt:"a1",channel:"corp",imgFormat:"1200",imgTpl:"konzept",imgTitle:"Das Lizenz-Aus bei Neodigital",
+      comment:"",appr:"pending",
+      toast:null};
+  }
+  componentWillUnmount(){clearInterval(this._iv);clearTimeout(this._tt);clearTimeout(this._nav);}
+  t=(m)=>{clearTimeout(this._tt);this.setState({toast:m});this._tt=setTimeout(()=>this.setState({toast:null}),3400);};
+  go=(s)=>this.setState({screen:s});
+  openArt=(a)=>{
+    if(this.RV[a.id]&&a.col!=="ghost"){this.setState({screen:"review",curId:a.id,tab:"q",view:"web",device:"desktop",activeSec:"pv-kat",ghostDone:false,ghostOpen:false});}
+    else if(a.col==="ghost"){this.t("Bereits in Ghost publiziert. Den Draft öffnen Sie im CMS.");}
+    else{this.t("Noch in Verarbeitung: Das Review ist ab Status „Review“ verfügbar.");}
+  };
+  jump=(id)=>{
+    const w=document.getElementById("pv-scroll"),el=document.getElementById(id);
+    if(w&&el){w.scrollTo({top:el.getBoundingClientRect().top-w.getBoundingClientRect().top+w.scrollTop-18,behavior:"smooth"});}
+    this.setState({activeSec:id});
+  };
+  start=()=>{
+    if(!this.state.file)return;
+    this.setState({processing:true,step:0});
+    this._iv=setInterval(()=>{
+      const n=this.state.step+1;
+      if(n>=4){clearInterval(this._iv);this.setState({step:4});
+        this._nav=setTimeout(()=>{this.setState({processing:false,step:-1,file:null,screen:"review",curId:"a1",tab:"s",view:"web",device:"desktop",activeSec:"pv-kat"});this.t("Aufbereitung abgeschlossen: 2 Stilcheck-Hinweise gefunden.");},900);}
+      else{this.setState({step:n});}
+    },1150);
+  };
+  openGhost=()=>{
+    if(this.state.role!=="Herausgeber"){this.t("Nur Herausgeber können nach Ghost übertragen.");return;}
+    const r=this.RV[this.state.curId]||this.RV.a1;
+    this.setState({ghostOpen:true,ghostDone:false,headline:r.title,excerpt:r.excerpts[0],exVar:0,ghostImg:0});
+  };
+  createDraft=()=>{this.setState({ghostDone:true,articles:this.state.articles.map(a=>a.id===this.state.curId?Object.assign({},a,{col:"ghost"}):a)});};
+  copy=(txt)=>{try{navigator.clipboard.writeText(txt);}catch(e){}this.t("Post in die Zwischenablage kopiert.");};
+  renderVals(){
+    const s=this.state;
+    const mono={fontFamily:"var(--font-mono)"};
+    const NAV=[["pipeline","Pipeline"],["new","Neuer Artikel"],["linkedin","LinkedIn Studio"],["settings","Einstellungen"]];
+    const navBtn=(on)=>({display:"flex",alignItems:"center",gap:"10px",width:"100%",textAlign:"left",padding:"9px 12px",border:"1px solid "+(on?"rgb(36 104 232 / 0.45)":"transparent"),borderRadius:"4px",background:on?"rgb(36 104 232 / 0.28)":"transparent",color:on?"#fff":"rgb(255 255 255 / 0.72)",fontSize:"0.88rem",fontWeight:600,cursor:"pointer"});
+    const nav=NAV.map(([id,label])=>({id,label,onClick:()=>this.go(id),style:navBtn(s.screen===id)}));
+    // Pipeline
+    const srch=s.search.trim().toLowerCase();
+    const match=(a)=>(s.filter==="alle"||a.format===s.filter)&&(!srch||a.title.toLowerCase().indexOf(srch)>=0);
+    const dot=(k)=>({display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:k==="good"?"var(--c-success)":k==="warn"?"#d99a06":"var(--c-neutral-300)"});
+    const columns=this.COLS.map(([id,label,hint])=>{
+      const cards=s.articles.filter(a=>a.col===id&&match(a)).map(a=>({
+        id:a.id,title:a.title,format:a.format,author:a.author,
+        tagClass:a.format==="Sponsored"?"tag tag-brass":"tag",
+        scoreLabel:a.score?a.score+"/16":"—",
+        scoreStyle:Object.assign({},mono,{fontSize:"0.72rem",fontWeight:600,color:a.score?(a.score>=13?"var(--c-brass-700)":"var(--c-danger)"):"var(--text-muted)"}),
+        checks:a.checks.map(([k,ti])=>({style:dot(k),title:ti})),
+        onClick:()=>this.openArt(a)}));
+      return {id,label,hint,count:(cards.length<10?"0":"")+cards.length,cards,empty:cards.length===0};});
+    const total=columns.reduce((n,c)=>n+c.cards.length,0);
+    // Neuer Artikel
+    const steps=["Text analysieren","Struktur aufbauen","HTML-Card generieren","Checks ausführen"].map((label,i)=>{
+      const st=s.step>i?"done":s.step===i?"active":"wait";
+      return {label,num:"0"+(i+1),
+        state:st==="done"?"ABGESCHLOSSEN":st==="active"?"LÄUFT":"WARTEND",
+        stateStyle:Object.assign({},mono,{fontSize:"0.6rem",letterSpacing:"0.06em",color:st==="done"?"var(--c-success)":st==="active"?"var(--c-blue-700)":"var(--text-muted)"}),
+        labelStyle:{fontSize:"0.92rem",fontWeight:st==="active"?700:600,color:st==="wait"?"var(--text-muted)":"var(--text-primary)"},
+        dotStyle:{width:"28px",height:"28px",flex:"none",borderRadius:"50%",display:"grid",placeItems:"center",fontFamily:"var(--font-mono)",fontSize:"0.6rem",fontWeight:700,
+          background:st==="done"?"var(--c-blue-700)":st==="active"?"var(--c-blue-050)":"var(--c-white)",
+          color:st==="done"?"#fff":st==="active"?"var(--c-blue-800)":"var(--text-muted)",
+          border:"1px solid "+(st==="wait"?"var(--border-medium)":"var(--c-blue-700)"),
+          animation:st==="active"?"vtm-step-pulse 1.4s ease infinite":"none"},
+        done:st==="done"};});
+    const togKnob={position:"absolute",top:"2px",left:s.spon?"22px":"2px",width:"18px",height:"18px",borderRadius:"50%",background:"#fff",transition:"left 160ms var(--ease-signal)",boxShadow:"0 1px 3px rgb(18 30 57 / 0.3)"};
+    const togTrack={position:"relative",width:"44px",height:"24px",flex:"none",borderRadius:"12px",border:"1px solid "+(s.spon?"var(--c-blue-800)":"var(--c-neutral-300)"),background:s.spon?"var(--c-blue-700)":"var(--c-neutral-200)",cursor:"pointer",transition:"background 160ms ease"};
+    // Review
+    const cur=s.articles.find(a=>a.id===s.curId)||this.ARTS[0];
+    const r=this.RV[cur.id]||this.RV.a1;
+    const spon=!!r.sponsored;
+    const baseItems=[["pv-kat","Kategorie-Zeile",false],["pv-hint","App-Hinweisblock",false],["pv-lead","Lead",false],["pv-wichtig","„Das Wichtigste“ (3 Kernerkenntnisse)",false]];
+    const midItems=r.sections.map((sec,i)=>["pv-s"+i,sec.h2,false]);
+    const tailItems=[["pv-gegen","Gegenargumente und Grenzen",spon],["pv-wert","Redaktionelle Wertung",spon],["pv-todo","Was Versicherer jetzt tun sollten",false],["pv-fazit","Fazit",false],["pv-quellen","Quellenverzeichnis",false],["pv-cta","CTA (genau einer)",false]];
+    const outline=baseItems.concat(midItems,tailItems).map(([id,label,off],i)=>({
+      label,off:!!off,note:off?"entfällt bei Sponsored":"",num:(i+1<10?"0":"")+(i+1),
+      onClick:off?()=>{}:()=>this.jump(id),
+      numStyle:Object.assign({},mono,{fontSize:"0.58rem",color:off?"var(--c-neutral-300)":s.activeSec===id?"var(--c-blue-700)":"var(--text-muted)"}),
+      style:{display:"flex",alignItems:"baseline",gap:"9px",width:"100%",textAlign:"left",padding:"7px 10px",border:"1px solid "+(s.activeSec===id&&!off?"var(--border-electric)":"transparent"),borderRadius:"4px",background:s.activeSec===id&&!off?"var(--c-blue-050)":"transparent",color:off?"var(--text-muted)":"var(--text-primary)",opacity:off?0.55:1,cursor:off?"default":"pointer",fontSize:"0.8rem",fontWeight:s.activeSec===id&&!off?600:500,lineHeight:1.35}}));
+    const segBtn=(on)=>({padding:"6px 12px",border:"1px solid "+(on?"var(--c-blue-700)":"var(--border-medium)"),background:on?"var(--c-blue-700)":"var(--c-white)",color:on?"#fff":"var(--text-secondary)",fontFamily:"var(--font-mono)",fontSize:"0.62rem",fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",cursor:"pointer",borderRadius:"4px"});
+    const viewBtns=[["web","Web-Ansicht"],["outlook","Outlook-Ansicht"]].map(([v,l])=>({label:l,style:segBtn(s.view===v),onClick:()=>this.setState({view:v})}));
+    const deviceBtns=[["desktop","Desktop"],["mobile","Mobil"]].map(([v,l])=>({label:l,style:segBtn(s.device===v),onClick:()=>this.setState({device:v})}));
+    const ol=s.view==="outlook";
+    const pvStyle={width:s.device==="mobile"?"375px":"720px",maxWidth:"100%",margin:"0 auto",background:"#fff",border:"1px solid var(--border-soft)",borderRadius:ol?"0":"6px",boxShadow:ol?"none":"var(--shadow-soft)",padding:s.device==="mobile"?"24px 18px":"40px 48px",position:"relative",animation:"vtm-fade 200ms ease"};
+    const pvHintStyle={margin:"18px 0",padding:"13px 16px",background:ol?"#f2f6ff":"linear-gradient(90deg,rgb(18 63 166 / 0.055),transparent),var(--c-blue-050)",border:"1px solid rgb(18 63 166 / 0.15)",borderLeft:"3px solid var(--c-blue-700)",borderRadius:ol?"0":"0 6px 6px 0"};
+    const pvBoxStyle={margin:"22px 0",padding:"16px 18px",border:"1px solid var(--border-medium)",borderRadius:ol?"0":"6px",background:ol?"#fbfcfe":"var(--c-paper)"};
+    const pvCtaStyle={margin:"28px 0 0",padding:"20px 22px",borderRadius:ol?"0":"6px",background:ol?"#121e39":"radial-gradient(circle at 90% 0%, rgb(36 104 232 / 0.30), transparent 40%), var(--gradient-brand-deep)",color:"#fff"};
+    const tabs=[["q","Qualität"],["s","Stilcheck"],["f","Fakten"]].map(([id,l])=>({label:l,onClick:()=>this.setState({tab:id}),style:{flex:1,padding:"11px 4px",background:"none",border:"none",borderBottom:"2px solid "+(s.tab===id?"var(--c-blue-700)":"transparent"),color:s.tab===id?"var(--c-blue-800)":"var(--text-muted)",fontFamily:"var(--font-mono)",fontSize:"0.64rem",fontWeight:600,letterSpacing:"0.07em",textTransform:"uppercase",cursor:"pointer"}}));
+    const qsum=r.quality.reduce((n,p)=>n+p[1],0);
+    const qd=(on)=>({width:"16px",height:"5px",borderRadius:"2px",background:on?"var(--c-blue-700)":"var(--c-neutral-200)"});
+    const qcats=r.quality.map(([name,p])=>({name,pts:p+"/2",d1:qd(p>=1),d2:qd(p>=2),ptsStyle:Object.assign({},mono,{fontSize:"0.68rem",fontWeight:600,color:p===2?"var(--text-primary)":"var(--c-warning)"})}));
+    const findings=r.findings.map(f=>({rule:f.rule,text:f.text,hasJump:!!f.target,onJump:()=>this.jump(f.target),
+      boxStyle:{padding:"11px 12px",border:"1px solid "+(f.kind==="error"?"rgb(165 38 38 / 0.28)":"var(--border-soft)"),borderLeft:"3px solid "+(f.kind==="error"?"var(--c-danger)":"var(--c-success)"),borderRadius:"0 4px 4px 0",background:f.kind==="error"?"var(--c-danger-bg)":"var(--c-white)"},
+      ruleStyle:Object.assign({},mono,{fontSize:"0.58rem",fontWeight:700,letterSpacing:"0.07em",color:f.kind==="error"?"var(--c-danger)":"var(--c-success)"})}));
+    const errCount=r.findings.filter(f=>f.kind==="error").length;
+    const claims=r.claims.map(c=>({text:c.text,badge:c.badge,src:c.src,
+      badgeClass:"status "+(c.k==="b"?"status-good":c.k==="a"?"status-recommended":"status-warning"),
+      onSrc:(e)=>{e.preventDefault();this.t("Quelle öffnet extern (Demo): "+c.src);}}));
+    const diffRows=r.diff.map(d=>({outlet:d[0],label:d[1],cls:"status "+(d[2]?"status-warning":"status-good"),tagLabel:d[2]?"besetzt":"frei"}));
+    // Ghost modal
+    const exCount=s.excerpt.length;
+    const chip=(on)=>({padding:"5px 10px",border:"1px solid "+(on?"var(--c-blue-700)":"var(--border-medium)"),borderRadius:"4px",background:on?"var(--c-blue-050)":"var(--c-white)",color:on?"var(--c-blue-800)":"var(--text-secondary)",fontFamily:"var(--font-mono)",fontSize:"0.6rem",fontWeight:600,letterSpacing:"0.05em",cursor:"pointer"});
+    const suggChips=r.sugg.map(txt=>({text:txt,onPick:()=>this.setState({headline:txt})}));
+    const exChips=r.excerpts.map((txt,i)=>({label:"VARIANTE "+String.fromCharCode(65+i),style:chip(s.exVar===i),onPick:()=>this.setState({excerpt:txt,exVar:i})}));
+    const imgOpts=[["Konzept-Illustration","radial-gradient(circle at 80% 15%, rgb(36 104 232 / 0.45), transparent 50%), var(--gradient-brand-deep)"],["Zahlen-Fokus","radial-gradient(circle at 20% 85%, rgb(201 155 50 / 0.30), transparent 50%), var(--gradient-brand-deep)"],["Zitat-Karte","linear-gradient(135deg, #121e39, #203255)"]].map(([label,bg],i)=>({label,onPick:()=>this.setState({ghostImg:i}),
+      style:{width:"100%",aspectRatio:"1200 / 630",borderRadius:"4px",background:bg,border:"2px solid "+(s.ghostImg===i?"var(--c-blue-700)":"transparent"),cursor:"pointer",boxShadow:s.ghostImg===i?"0 0 0 3px rgb(36 104 232 / 0.18)":"none"},
+      labelStyle:Object.assign({},mono,{fontSize:"0.56rem",letterSpacing:"0.04em",color:s.ghostImg===i?"var(--c-blue-800)":"var(--text-muted)"})}));
+    const ghostTags=r.tags;
+    // LinkedIn
+    const liR=this.RV[s.liArt]||this.RV.a1;
+    const posts=((this.LI[s.liArt]||this.LI.a1)[s.channel]||[]).map((txt,i)=>({num:"VARIANTE "+(i+1),text:txt,chars:txt.length.toLocaleString("de-DE")+" Zeichen",onCopy:()=>this.copy(txt)}));
+    const chBtns=[["corp","VTM Unternehmensprofil"],["pers","Persönliches Profil"]].map(([v,l])=>({label:l,style:Object.assign(segBtn(s.channel===v),{flex:1,padding:"9px 10px"}),onClick:()=>this.setState({channel:v})}));
+    const fmtBtns=[["1200","1200 × 630"],["1080","1080 × 1080"]].map(([v,l])=>({label:l,style:segBtn(s.imgFormat===v),onClick:()=>this.setState({imgFormat:v})}));
+    const tplBtns=[["konzept","Konzept"],["zahlen","Zahlen-Fokus"],["zitat","Zitat-Karte"]].map(([v,l])=>({label:l,style:segBtn(s.imgTpl===v),onClick:()=>this.setState({imgTpl:v})}));
+    const canvasStyle={position:"relative",overflow:"hidden",width:"100%",aspectRatio:s.imgFormat==="1200"?"1200 / 630":"1 / 1",borderRadius:"6px",background:"radial-gradient(circle at 85% 10%, rgb(36 104 232 / 0.35), transparent 45%), var(--gradient-brand-deep)",boxShadow:"var(--shadow-medium)"};
+    // Approval
+    const histBase=[
+      {d:"14.07.2026",t:"Entwurf aus Ihrem Manuskript erstellt. Ihr Text wurde unverändert übernommen."},
+      {d:"18.07.2026",t:"Interne Prüfung abgeschlossen: Qualitätsscore 15/16, keine Stilverstöße."},
+      {d:"21.07.2026",t:"Zur Kundenfreigabe an d.velop gesendet."}];
+    const history=histBase.concat(
+      s.appr==="approved"?[{d:"24.07.2026",t:"Freigegeben durch d.velop."}]:
+      s.appr==="change"?[{d:"24.07.2026",t:"Änderung angefragt: „"+(s.comment.trim()||"ohne Kommentar")+"“"}]:[]);
+    const apprBadgeCls="status "+(s.appr==="approved"?"status-good":s.appr==="change"?"status-error":"status-warning");
+    const apprBadgeLabel=s.appr==="approved"?"Freigegeben":s.appr==="change"?"Änderung angefragt":"Freigabe ausstehend";
+    return {
+      // shell
+      nav,role:s.role,onRole:(e)=>{this.setState({role:e.target.value});this.t("Rolle gewechselt: "+e.target.value+".");},
+      showSidebar:s.screen!=="approval",
+      apprNavStyle:Object.assign(navBtn(false),{fontSize:"0.8rem"}),
+      goApproval:()=>this.go("approval"),
+      isPipeline:s.screen==="pipeline",isNew:s.screen==="new",isReview:s.screen==="review",isLinkedin:s.screen==="linkedin",isSettings:s.screen==="settings",isApproval:s.screen==="approval",
+      toastOn:!!s.toast,toastMsg:s.toast||"",
+      // pipeline
+      search:s.search,onSearch:(e)=>this.setState({search:e.target.value}),
+      filter:s.filter,onFilter:(e)=>this.setState({filter:e.target.value}),
+      resetFilter:()=>this.setState({filter:"alle",search:""}),
+      goNew:()=>this.setState({screen:"new",processing:false,step:-1}),
+      goPipeline:()=>this.go("pipeline"),
+      columns,boardEmpty:total===0,boardFilled:total>0,
+      // neuer artikel
+      hasFile:!!s.file,noFile:!s.file,fileName:s.file||"",
+      addFile:()=>this.setState({file:"Neodigital_BaFin_final.docx · 38 KB"}),
+      removeFile:()=>this.setState({file:null}),
+      kategorie:s.kategorie,onKategorie:(e)=>this.setState({kategorie:e.target.value}),
+      artFormat:s.artFormat,onArtFormat:(e)=>this.setState({artFormat:e.target.value}),
+      frage:s.frage,onFrage:(e)=>this.setState({frage:e.target.value}),
+      anlass:s.anlass,onAnlass:(e)=>this.setState({anlass:e.target.value}),
+      cta:s.cta,onCta:(e)=>this.setState({cta:e.target.value}),
+      spon:s.spon,toggleSpon:()=>this.setState({spon:!s.spon}),togKnob,togTrack,
+      client:s.client,onClient:(e)=>this.setState({client:e.target.value}),
+      canStart:!!s.file&&!s.processing,startClass:"button button-primary",onStart:this.start,
+      startDisabled:!s.file,
+      processing:s.processing,notProcessing:!s.processing,steps,
+      // review
+      rvTitle:cur.title,rvFormat:cur.format,rvTagClass:cur.format==="Sponsored"?"tag tag-brass":"tag",
+      rvAuthor:cur.author,rvIsSponsored:spon,rvNotSponsored:!spon,
+      rvScoreChip:qsum+"/16",
+      rvKat:r.kategorie,rvLead:r.lead,rvWichtig:r.wichtigste,rvSections:r.sections.map((sec,i)=>({id:"pv-s"+i,h2:sec.h2,text:sec.text})),
+      rvGegen:r.gegen,rvWert:r.wert,rvTodo:r.todo,rvFazit:r.fazit,rvQuellen:r.quellen,rvCta:r.cta,
+      outline,viewBtns,deviceBtns,isOutlook:ol,
+      pvStyle,pvHintStyle,pvBoxStyle,pvCtaStyle,
+      tabs,tabQ:s.tab==="q",tabS:s.tab==="s",tabF:s.tab==="f",
+      qcats,qSum:qsum,ringOff:this.C*(1-qsum/16),ringCirc:this.C,
+      ringColor:qsum>=13?"var(--c-brass-500)":"var(--c-danger)",
+      qBadgeClass:"status "+(qsum>=13?"status-good":"status-error"),
+      qBadgeLabel:qsum>=13?"Mindestwert 13 erreicht":"Unter Mindestwert 13",
+      findings,errCount,findingsSummary:errCount>0?errCount+" Verstöße gefunden":"Keine Verstöße",
+      findingsSummaryStyle:Object.assign({},mono,{fontSize:"0.64rem",fontWeight:700,letterSpacing:"0.06em",color:errCount>0?"var(--c-danger)":"var(--c-success)"}),
+      claims,diffRows,diffNote:r.diffNote,
+      openGhost:this.openGhost,ghostAria:s.role!=="Herausgeber"?"true":"false",
+      goLinkedinFromReview:()=>{const id=this.LI[s.curId]?s.curId:"a1";this.setState({screen:"linkedin",liArt:id,imgTitle:(this.RV[id]||this.RV.a1).imgTitle});},
+      // ghost modal
+      ghostOpen:s.ghostOpen,ghostForm:!s.ghostDone,ghostDone:s.ghostDone,
+      closeGhost:()=>this.setState({ghostOpen:false}),
+      headline:s.headline,onHeadline:(e)=>this.setState({headline:e.target.value}),
+      suggChips,excerpt:s.excerpt,onExcerpt:(e)=>this.setState({excerpt:e.target.value}),exChips,
+      exCount:exCount+"/300",
+      exCountStyle:Object.assign({},mono,{fontSize:"0.66rem",fontWeight:600,color:exCount>300?"var(--c-danger)":"var(--text-muted)"}),
+      exOver:exCount>300,
+      ghostTags,imgOpts,
+      onCreateDraft:this.createDraft,
+      onOpenGhostLink:(e)=>{e.preventDefault();this.t("Ghost öffnet im neuen Tab (Demo): versicherungstech-magazin.de/ghost/#/editor");},
+      // linkedin
+      liArt:s.liArt,onLiArt:(e)=>{const id=e.target.value;this.setState({liArt:id,imgTitle:(this.RV[id]||this.RV.a1).imgTitle});},
+      chBtns,isCorp:s.channel==="corp",
+      channelHint:s.channel==="corp"?"Sie-Form, sachlich. Aufbau: These-Hook, Faktenabsätze, drei Aufzählungspunkte als vollständige Sätze, Abschluss „Jetzt lesen und mitdiskutieren.“, fünf Hashtags.":"Du-Form, nahbar. Persönliche Einschätzung, eine Frage an die Leser, weniger Hashtags.",
+      posts,fmtBtns,tplBtns,canvasStyle,
+      tKonzept:s.imgTpl==="konzept",tZahlen:s.imgTpl==="zahlen",tZitat:s.imgTpl==="zitat",
+      imgTitle:s.imgTitle,onImgTitle:(e)=>this.setState({imgTitle:e.target.value}),
+      liKicker:"VTM / "+(s.liArt==="a3"?"PRAXIS-CASE":"ANALYSE"),
+      liStat:s.liArt==="a3"?"82 %":"500.000",
+      liStatLabel:s.liArt==="a3"?"DUNKELVERARBEITUNG OHNE MANUELLEN EINGRIFF · ANDSAFE, 06/2026":"POLICEN: SKALENSCHWELLE DES EIGENEN LIZENZMODELLS · VTM-BERECHNUNG",
+      liQuote:s.liArt==="a3"?"Wer Automatisierung ernst meint, definiert zuerst, wo sie endet.":"Gescheitert ist nicht die Technologie, sondern die Annahme, dass eine eigene Lizenz der schnellste Weg zur Skalierung ist.",
+      liQuoteSrc:s.liArt==="a3"?"PRAXIS-CASE ANDSAFE / D.VELOP":"VTM-ANALYSE, JULI 2026",
+      onPreviewFull:()=>this.t("Vollständige Vorschau öffnet im neuen Tab (Demo)."),
+      liSponsored:s.liArt==="a3",
+      onDownload:()=>this.t("Beitragsbild wird exportiert: vtm-"+s.imgFormat+(s.imgFormat==="1200"?"x630":"x1080")+".png (Demo)."),
+      exportLabel:s.imgFormat==="1200"?"EXPORT 1200 × 630 · PNG · 2X":"EXPORT 1080 × 1080 · PNG · 2X",
+      // approval
+      history,apprBadgeCls,apprBadgeLabel,apprPending:s.appr==="pending",apprDecided:s.appr!=="pending",
+      apprDoneNote:s.appr==="approved"?"Vielen Dank. Die Redaktion plant die Veröffentlichung und informiert Sie über den Termin.":"Vielen Dank. Die Redaktion meldet sich mit einer überarbeiteten Fassung.",
+      comment:s.comment,onComment:(e)=>this.setState({comment:e.target.value}),
+      onApprove:()=>{this.setState({appr:"approved",articles:s.articles.map(a=>a.id==="a3"?Object.assign({},a,{col:"bereit"}):a)});this.t("Freigabe übermittelt. Die Redaktion wurde benachrichtigt.");},
+      onReqChange:()=>{if(!s.comment.trim()){this.t("Bitte beschreiben Sie die gewünschte Änderung im Kommentarfeld.");return;}this.setState({appr:"change"});this.t("Änderungswunsch übermittelt.");},
+      backToStudio:()=>this.go("pipeline"),
+      // settings
+      onTestGhost:()=>this.t("Verbindung geprüft: OK, 124 ms Antwortzeit."),
+      onCopySnippet:()=>this.copy('<div class="vtm-app-hint">Dieser Beitrag erscheint zuerst im AI Insurance Briefing. Alle Analysen und Research-Daten lesen Sie in der VTM-App.</div>'),
+      snippet:'<div class="vtm-app-hint">\n  Dieser Beitrag erscheint zuerst im\n  <strong>AI Insurance Briefing</strong>.\n  Alle Analysen und Research-Daten\n  lesen Sie in der VTM-App.\n</div>',
+      onAddAccount:()=>this.t("Kontoverknüpfung öffnet LinkedIn OAuth (Demo).")
+    };
+  }
+}
+</script>
+</body>
+</html>

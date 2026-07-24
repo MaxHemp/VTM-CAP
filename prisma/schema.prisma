@@ -135,6 +135,7 @@ model Artikel {
   freigabeTokens FreigabeToken[]
   jobs           Job[]
   auditLogs      AuditLog[]
+  upload         Upload?
 
   @@index([status])
 }
@@ -202,6 +203,7 @@ model Job {
   status        JobStatus @default(WARTEND)
   schritt       Int       @default(0)
   schrittStatus Json?
+  briefing      Json?
   fehler        String?   @db.Text
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -209,4 +211,17 @@ model Job {
   artikel Artikel @relation(fields: [artikelId], references: [id], onDelete: Cascade)
 
   @@index([status])
+}
+
+// Hochgeladenes Originalmanuskript (Bytes in der DB, damit die Verarbeitung
+// auch in Serverless-Umgebungen ohne gemeinsames Dateisystem funktioniert)
+model Upload {
+  id        String   @id @default(cuid())
+  artikelId String   @unique
+  dateiname String
+  mime      String?
+  daten     Bytes
+  createdAt DateTime @default(now())
+
+  artikel Artikel @relation(fields: [artikelId], references: [id], onDelete: Cascade)
 }

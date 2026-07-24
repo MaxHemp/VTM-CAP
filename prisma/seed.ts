@@ -152,7 +152,52 @@ async function main() {
     });
   }
 
-  console.log("Seed abgeschlossen: 2 Benutzer, 6 Beispielartikel, 1 Demo-Card im Review.");
+  // Sponsored-Demo (M5): aufbereitete Kunden-Card samt offenem Freigabelink,
+  // damit die Kundenansicht /freigabe/demo-freigabe-token demonstrierbar ist.
+  const sponsoredArtikel = await prisma.artikel.findFirst({
+    where: { sponsored: true, cardHtml: null },
+  });
+  if (sponsoredArtikel) {
+    const kundentext =
+      "Die digitale Aktenverwaltung entlastet Maklerbetriebe im Tagesgeschäft spürbar. " +
+      "Gemeinsam mit dem Kunden wurde die Umstellung in neun Monaten abgeschlossen. " +
+      "Die Bearbeitungszeit pro Vorgang sank nach Unternehmensangaben um ein Drittel. " +
+      "Komplexe Sonderfälle bleiben bewusst in der persönlichen Betreuung. " +
+      "Die Datenhaltung erfüllt die aufsichtsrechtlichen Anforderungen an Revisionssicherheit. " +
+      "Der Umstieg gelang ohne Unterbrechung des laufenden Betriebs.";
+    const sponsoredCard = baueMockCard({
+      kategorie: sponsoredArtikel.kategorie ?? "Vertrieb",
+      format: "Praxis-Case",
+      sponsored: true,
+      kunde: sponsoredArtikel.kunde ?? "d.velop",
+      ctaLabel: "Mehr zum Projekt erfahren",
+      ctaUrl: "https://example.com/#LINK-ZU-DVELOP-EINSETZEN",
+      rohtext: kundentext,
+    });
+    await prisma.artikel.update({
+      where: { id: sponsoredArtikel.id },
+      data: {
+        quelltextOriginal: kundentext,
+        quelltextHash: quelltextHash(kundentext),
+        cardHtml: sponsoredCard,
+        stilcheckFindings: pruefeCard(sponsoredCard, { sponsored: true }) as unknown as Prisma.InputJsonValue,
+      },
+    });
+    const vorhandenerToken = await prisma.freigabeToken.findUnique({ where: { token: "demo-freigabe-token" } });
+    if (!vorhandenerToken) {
+      await prisma.freigabeToken.create({
+        data: {
+          artikelId: sponsoredArtikel.id,
+          token: "demo-freigabe-token",
+          kundeEmail: "freigabe@kunde.example",
+          status: "OFFEN",
+          gueltigBis: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+  }
+
+  console.log("Seed abgeschlossen: 2 Benutzer, 6 Beispielartikel, Demo-Cards für Review und Kundenfreigabe.");
 }
 
 main()

@@ -10,6 +10,11 @@ export function middleware(request: NextRequest) {
   if (OEFFENTLICHE_PFADE.some((pfad) => pathname.startsWith(pfad))) {
     return NextResponse.next();
   }
+  // Tokenisierte Kundenfreigabe (M5): /freigabe/<token> ist ohne Account
+  // erreichbar; die interne Übersicht /freigabe bleibt geschützt.
+  if (/^\/freigabe\/[^/]+/.test(pathname)) {
+    return NextResponse.next();
+  }
   const hatSession =
     request.cookies.has("authjs.session-token") || request.cookies.has("__Secure-authjs.session-token");
   if (!hatSession) {

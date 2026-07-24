@@ -135,16 +135,7 @@ export function LinkedInStudio({
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "minmax(380px, 1fr) 440px",
-        gap: 22,
-        maxWidth: 1240,
-        minWidth: "min-content",
-        alignItems: "start",
-      }}
-    >
+    <div className="studio-grid">
       <div style={{ display: "grid", gap: 14 }}>
         <div className="card" style={{ padding: "18px 20px", display: "grid", gap: 14 }}>
           <div style={{ display: "grid", gap: 6 }}>

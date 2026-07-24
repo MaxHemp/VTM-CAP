@@ -159,6 +159,15 @@ export function ReviewClient({
         >
           SCORE {scoreWert !== null ? `${scoreWert}/16` : "—"}
         </span>
+        {artikel.sponsored ? (
+          <Link
+            href="/freigabe"
+            className="button button-quiet"
+            style={{ minHeight: 36, padding: "0.3rem 0.7rem", fontSize: "0.82rem" }}
+          >
+            Kundenansicht
+          </Link>
+        ) : null}
         <Link
           href={`/linkedin?artikel=${artikel.id}`}
           className="button button-secondary"
@@ -187,7 +196,7 @@ export function ReviewClient({
         )}
       </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "250px minmax(460px, 1fr) 338px", flex: 1, minHeight: 0, overflowX: "auto" }}>
+      <div className="review-grid" style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
         {/* Outline */}
         <aside style={{ overflow: "auto", background: "var(--c-white)", borderRight: "1px solid var(--border-soft)", padding: "14px 10px" }}>
           <div style={{ ...monoKlein, padding: "0 10px 10px" }}>STRUKTUR / REDAKTIONSANLEITUNG</div>

@@ -6,6 +6,7 @@
 // eine Integration samt Admin API Key programmatisch anlegen. Es werden
 // keine echten Secrets benötigt.
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { parseAdminApiKey } from "@/lib/ghost";
 import { baueMockCard } from "@/lib/mock-card";
 import {
   erstelleGhostDraft,
@@ -89,14 +90,16 @@ async function provisioniereAdminKey(): Promise<string> {
   };
   const integration = daten.integrations.find((eintrag) => eintrag.name === integrationName);
   const adminKey = integration?.api_keys?.find((key) => key.type === "admin");
-  if (!adminKey?.secret || !/^[0-9a-f]+$/i.test(adminKey.secret)) {
+  if (!adminKey?.secret) {
     throw new Error(
-      `Die Integration liefert keinen brauchbaren Admin API Key. Erhalten: ${JSON.stringify(
-        integration?.api_keys?.map((key) => ({ type: key.type, id: key.id, secretLaenge: key.secret?.length ?? 0 }))
-      )}`
+      `Die Integration liefert keinen Admin API Key. Erhalten: ${JSON.stringify(integration?.api_keys)}`
     );
   }
-  return `${adminKey.id}:${adminKey.secret}`;
+  // Ghost liefert das Admin-Secret hier bereits als vollständigen
+  // "id:secret"-String (24 Hex-Zeichen id + ":" + 64 Hex-Zeichen Secret).
+  const keyString = adminKey.secret.includes(":") ? adminKey.secret : `${adminKey.id}:${adminKey.secret}`;
+  parseAdminApiKey(keyString); // validiert Format und Hex-Secret, wirft sonst verständlich
+  return keyString;
 }
 
 describe.skipIf(!aktiv)("Ghost-Draft als Lexical-html-Card (Admin API)", () => {

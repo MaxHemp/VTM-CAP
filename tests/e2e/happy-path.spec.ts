@@ -70,5 +70,6 @@ test("Upload → Review → Publish-Modal → Ghost-Draft", async ({ page, conte
   // Draft erstellen (MOCK_GHOST) und Erfolg prüfen
   await page.getByRole("button", { name: "Draft erstellen" }).click();
   await expect(page.getByText("Draft in Ghost erstellt")).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByRole("link", { name: "Draft in Ghost öffnen" })).toBeVisible();
+  // Nach router.refresh() existiert der Link doppelt (Modal + Review-Header)
+  await expect(page.getByRole("link", { name: "Draft in Ghost öffnen" }).first()).toBeVisible();
 });

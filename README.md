@@ -4,7 +4,14 @@ Interne Redaktionsplattform des **VersicherungsTech Magazins (VTM)**. VTM Studio
 
 Auftrag und Meilensteinplan: `PROMPT_Claude_Code_VTM_Studio.md` · Umsetzungsplan M1: `docs/PLAN_M1.md`
 
-**Stand: Meilenstein M1 (Fundament)** – Projekt-Setup, Prisma-Datenmodell, Auth mit Rollen, App-Shell nach `design/`, Pipeline-Board, Einstellungen mit Ghost-Verbindungstest und verschlüsselter Key-Ablage. Upload/Pipeline (M2), Ghost-Publishing (M3), LinkedIn Studio (M4) und Sponsored-Freigabe (M5) folgen.
+**Stand: Meilenstein M2 (Artikel-Pipeline)** – zusätzlich zu M1 (Fundament, Auth, Pipeline-Board, Einstellungen): Manuskript-Upload (DOCX/PDF/MD/TXT) mit Briefing, Verarbeitungsjob mit Stepper (Extraktion → Card-Generierung → Checks → Persistenz), Stilcheck-Port (`lib/stilcheck.ts`, deckungsgleich zu `brand-rules/scripts/stilcheck.py`), LLM-Qualitätsscore (8 Kategorien, Schwelle 13/16), Faktencheck-Extraktion (BELEGT/ABLEITUNG/PROGNOSE) und Review-Screen (Outline, Web-/Outlook-Preview, Prüf-Panel, Inline-Bearbeitung mit erneuter Prüfung). Ghost-Publishing (M3), LinkedIn Studio (M4) und Sponsored-Freigabe (M5) folgen.
+
+### KI-Betrieb (M2)
+
+- Card-Generierung, Qualitätsscore und Faktencheck laufen über die Anthropic API (Modell `claude-sonnet-4-6`, im Auftrag fixiert). Der Systemprompt wird zur Laufzeit aus `brand-rules/` zusammengesetzt; bei Sponsored Content mit Vorrangregeln aus `sponsored-content.md`.
+- Der API-Key kommt aus den Einstellungen (verschlüsselt) oder aus `ANTHROPIC_API_KEY`.
+- **`MOCK_KI=1`** aktiviert eine deterministische Mock-Schicht ohne API-Key (Entwicklung, CI, E2E): Die Card wird aus den Original-Bausteinen in `references/komponenten.md` gebaut und besteht den Stilcheck.
+- Die Verarbeitung läuft als DB-Queue mit Status-Polling: Jeder Poll-Tick führt genau einen Schritt aus (serverless-tauglich, kein Redis, kein Worker).
 
 ## Architekturüberblick
 

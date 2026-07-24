@@ -45,9 +45,16 @@ export default async function ArtikelDetailSeite({ params }: { params: Promise<{
         bereich="REDAKTION / ARTIKEL"
         titel={artikel.titel}
         aktionen={
-          <Link href="/pipeline" className="button button-secondary">
-            Zurück zur Pipeline
-          </Link>
+          <>
+            {artikel.cardHtml ? (
+              <Link href={`/artikel/${artikel.id}/review`} className="button button-primary">
+                Zum Review
+              </Link>
+            ) : null}
+            <Link href="/pipeline" className="button button-secondary">
+              Zurück zur Pipeline
+            </Link>
+          </>
         }
       />
       <div style={{ flex: 1, overflow: "auto", padding: "22px 28px" }}>
@@ -93,9 +100,12 @@ export default async function ArtikelDetailSeite({ params }: { params: Promise<{
               wert={artikel.updatedAt.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" })}
             />
           </div>
-          <p style={{ margin: "16px 0 0", color: "var(--text-muted)", fontSize: "0.8rem", lineHeight: 1.6 }}>
-            Upload, automatische Aufbereitung und der Review-Bildschirm folgen mit Meilenstein M2.
-          </p>
+          {!artikel.cardHtml ? (
+            <p style={{ margin: "16px 0 0", color: "var(--text-muted)", fontSize: "0.8rem", lineHeight: 1.6 }}>
+              Für diesen Artikel liegt noch keine aufbereitete Card vor. Laden Sie das Manuskript über „Neuer
+              Artikel“ hoch, um die Aufbereitung zu starten.
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

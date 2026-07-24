@@ -15,7 +15,7 @@ const STATUS_BADGES: Record<string, { label: string; klasse: string }> = {
 
 export default async function FreigabeUebersichtSeite() {
   const session = await auth();
-  const darfErstellen = session?.user.rolle === "HERAUSGEBER";
+  const darfErstellen = Boolean(session?.user.rechte.freigabenVerwalten);
   const sponsoredArtikel = await prisma.artikel.findMany({
     where: { sponsored: true, cardHtml: { not: null } },
     orderBy: { updatedAt: "desc" },

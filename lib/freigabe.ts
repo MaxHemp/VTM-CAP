@@ -75,7 +75,7 @@ export async function entscheideFreigabe(
   });
 
   // Benachrichtigung an alle Herausgeber
-  const herausgeber = await prisma.user.findMany({ where: { rolle: "HERAUSGEBER" } });
+  const herausgeber = await prisma.user.findMany({ where: { rolle: { freigabenVerwalten: true } } });
   const betreff =
     entscheidung === "FREIGEGEBEN"
       ? `Sponsored-Freigabe erteilt: ${geladen.token.artikel.titel}`

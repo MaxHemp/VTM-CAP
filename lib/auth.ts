@@ -2,9 +2,9 @@ import NextAuth from "next-auth";
 import Nodemailer from "next-auth/providers/nodemailer";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { createTransport } from "nodemailer";
-import type { Rolle } from "@prisma/client";
 import { istAnmeldungErlaubt } from "@/lib/benutzer";
 import { prisma } from "@/lib/db";
+import { RECHTE, extrahiereRechte, type RechteSchluessel } from "@/lib/rollen";
 
 // Magic-Link-Versand: mit konfiguriertem SMTP_HOST per E-Mail, sonst wird der
 // Link in der Server-Konsole ausgegeben (Entwicklung/CI).
@@ -62,42 +62,53 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.rolle = (user as { rolle?: Rolle }).rolle ?? "REDAKTEUR";
-        return token;
       }
-      // Zugang und Rolle bei jedem Request gegen die Datenbank prüfen:
-      // Entfernte Benutzer werden sofort abgemeldet, Rollenänderungen
-      // greifen ohne Neuanmeldung.
+      // Zugang, Rolle und Rechte bei jedem Request gegen die Datenbank
+      // prüfen: Entfernte Benutzer werden sofort abgemeldet; Rollen- und
+      // Rechteänderungen greifen ohne Neuanmeldung.
       if (token.id) {
         const benutzer = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { rolle: true },
+          select: { name: true, email: true, rolle: true },
         });
         if (!benutzer) {
           return null;
         }
-        token.rolle = benutzer.rolle;
+        token.name = benutzer.name;
+        token.email = benutzer.email;
+        token.rolle = benutzer.rolle.name;
+        token.rechte = extrahiereRechte(benutzer.rolle);
       }
       return token;
     },
     session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.rolle = token.rolle as Rolle;
+        session.user.rolle = token.rolle ?? "Redakteur";
+        session.user.rechte = extrahiereRechte(token.rechte);
+        if (token.name !== undefined) {
+          session.user.name = token.name;
+        }
+        if (token.email) {
+          session.user.email = token.email;
+        }
       }
       return session;
     },
   },
 });
 
-// Serverseitiges Rollen-Gate für Server-Actions und geschützte Seiten.
-export async function requireRolle(rolle: Rolle) {
+// Serverseitiges Rechte-Gate für Server-Actions und geschützte Seiten.
+export async function requireRecht(recht: RechteSchluessel) {
   const session = await auth();
   if (!session?.user) {
     throw new Error("Nicht angemeldet.");
   }
-  if (rolle === "HERAUSGEBER" && session.user.rolle !== "HERAUSGEBER") {
-    throw new Error("Diese Aktion ist der Rolle Herausgeber vorbehalten.");
+  if (!session.user.rechte[recht]) {
+    const definition = RECHTE.find((eintrag) => eintrag.schluessel === recht);
+    throw new Error(
+      `Diese Aktion erfordert das Recht „${definition?.label ?? recht}“. Ihre Rolle „${session.user.rolle}“ hat es nicht.`
+    );
   }
   return session;
 }

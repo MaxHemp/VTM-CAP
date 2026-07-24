@@ -9,9 +9,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Rolle {
-  HERAUSGEBER
-  REDAKTEUR
+// Rollen liegen in der Datenbank (frei definierbar, Einstellungen → Rollen).
+// Die beiden Systemrollen (feste IDs rolle-herausgeber / rolle-redakteur)
+// werden per Migration angelegt und sind nicht änderbar.
+model BenutzerRolle {
+  id                     String  @id @default(cuid())
+  name                   String  @unique
+  beschreibung           String?
+  istSystem              Boolean @default(false)
+  artikelVerwalten       Boolean @default(false)
+  publizieren            Boolean @default(false)
+  freigabenVerwalten     Boolean @default(false)
+  teamVerwalten          Boolean @default(false)
+  einstellungenVerwalten Boolean @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  benutzer User[]
 }
 
 enum ArtikelStatus {
@@ -57,10 +71,11 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  rolle         Rolle     @default(REDAKTEUR)
+  rolleId       String    @default("rolle-redakteur")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  rolle     BenutzerRolle @relation(fields: [rolleId], references: [id], onDelete: Restrict)
   accounts  Account[]
   sessions  Session[]
   artikel   Artikel[]

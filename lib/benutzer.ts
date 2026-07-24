@@ -1,8 +1,7 @@
 // Benutzerverwaltung (Einladungs-Prinzip): Die Anmeldung ist auf hinterlegte
-// E-Mail-Adressen beschränkt. Zugänge werden von der Rolle Herausgeber unter
-// Einstellungen vergeben; die Einladung verschickt einen Link zur Login-Seite
-// (passwortlos, Magic-Link).
-import type { Rolle } from "@prisma/client";
+// E-Mail-Adressen beschränkt. Zugänge und Rollen werden unter Einstellungen
+// verwaltet (Recht „Team verwalten"); die Einladung verschickt einen Link zur
+// Login-Seite (passwortlos, Magic-Link).
 import { baueAppUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/db";
 import { sendeMail } from "@/lib/mail";
@@ -34,18 +33,17 @@ export async function istAnmeldungErlaubt(email: string | null | undefined): Pro
   return Boolean(benutzer);
 }
 
-export function baueEinladungsMail(eintrag: { name: string | null; rolle: Rolle }): {
+export function baueEinladungsMail(eintrag: { name: string | null; rollenName: string }): {
   betreff: string;
   text: string;
 } {
   const anrede = eintrag.name ? `Guten Tag ${eintrag.name},` : "Guten Tag,";
-  const rollenText = eintrag.rolle === "HERAUSGEBER" ? "Herausgeber" : "Redakteur";
   const loginUrl = `${baueAppUrl()}/login`;
   return {
     betreff: "Ihr Zugang zu VTM Studio",
     text:
       `${anrede}\n\n` +
-      `für Sie wurde ein Zugang zur Redaktionsplattform VTM Studio angelegt (Rolle: ${rollenText}).\n\n` +
+      `für Sie wurde ein Zugang zur Redaktionsplattform VTM Studio angelegt (Rolle: ${eintrag.rollenName}).\n\n` +
       `So melden Sie sich an:\n` +
       `1. Öffnen Sie ${loginUrl}\n` +
       `2. Geben Sie diese E-Mail-Adresse ein.\n` +
@@ -57,28 +55,33 @@ export function baueEinladungsMail(eintrag: { name: string | null; rolle: Rolle 
 export async function ladeBenutzerEin(eintrag: {
   email: string;
   name: string | null;
-  rolle: Rolle;
-}): Promise<{ id: string; email: string }> {
+  rolleId: string;
+}): Promise<{ id: string; email: string; rollenName: string }> {
   const email = normalisiereEmail(eintrag.email);
   const formatFehler = pruefeEmailFormat(email);
   if (formatFehler) {
     throw new Error(formatFehler);
+  }
+  const rolle = await prisma.benutzerRolle.findUnique({ where: { id: eintrag.rolleId } });
+  if (!rolle) {
+    throw new Error("Die gewählte Rolle existiert nicht (mehr). Bitte laden Sie die Seite neu.");
   }
   const vorhanden = await prisma.user.findUnique({ where: { email }, select: { id: true } });
   if (vorhanden) {
     throw new Error(`Für „${email}“ existiert bereits ein Zugang.`);
   }
   const benutzer = await prisma.user.create({
-    data: { email, name: eintrag.name?.trim() || null, rolle: eintrag.rolle },
+    data: { email, name: eintrag.name?.trim() || null, rolleId: rolle.id },
   });
-  const mail = baueEinladungsMail({ name: benutzer.name, rolle: benutzer.rolle });
+  const mail = baueEinladungsMail({ name: benutzer.name, rollenName: rolle.name });
   await sendeMail({ an: email, betreff: mail.betreff, text: mail.text });
-  return { id: benutzer.id, email };
+  return { id: benutzer.id, email, rollenName: rolle.name };
 }
 
-// Schutzregel: Es muss immer mindestens ein Herausgeber übrig bleiben.
-export async function zaehleWeitereHerausgeber(ausserBenutzerId: string): Promise<number> {
+// Schutzregel gegen Aussperren: Es muss immer mindestens ein Benutzer mit
+// dem Recht „Team verwalten" übrig bleiben.
+export async function zaehleWeitereTeamverwalter(ausserBenutzerId: string): Promise<number> {
   return prisma.user.count({
-    where: { rolle: "HERAUSGEBER", id: { not: ausserBenutzerId } },
+    where: { rolle: { teamVerwalten: true }, id: { not: ausserBenutzerId } },
   });
 }

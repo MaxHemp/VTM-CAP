@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireRolle } from "@/lib/auth";
+import { requireRecht } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { schreibeAuditLog } from "@/lib/audit";
 import { baueFreigabeUrl, erstelleFreigabeToken } from "@/lib/freigabe";
@@ -19,7 +19,7 @@ export async function erstelleFreigabeLinkAction(
 ): Promise<FreigabeLinkErgebnis> {
   let session;
   try {
-    session = await requireRolle("HERAUSGEBER");
+    session = await requireRecht("freigabenVerwalten");
   } catch (fehler) {
     return { ok: false, meldung: fehler instanceof Error ? fehler.message : "Keine Berechtigung." };
   }

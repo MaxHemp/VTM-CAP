@@ -1,19 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState } from "react";
 import type { AktionsErgebnis } from "./actions";
-import { aendereBenutzerRolleAction, entferneBenutzerAction, ladeBenutzerEinAction } from "./actions";
+import { aktualisiereBenutzerAction, entferneBenutzerAction, ladeBenutzerEinAction } from "./actions";
 
 export interface TeamMitglied {
   id: string;
   name: string | null;
   email: string;
-  rolle: "HERAUSGEBER" | "REDAKTEUR";
+  rolleId: string;
+  rollenName: string;
+  teamVerwalten: boolean;
 }
 
-const ROLLEN_LABELS: Record<TeamMitglied["rolle"], string> = {
-  HERAUSGEBER: "Herausgeber",
-  REDAKTEUR: "Redakteur",
+export interface RollenOption {
+  id: string;
+  name: string;
+}
+
+const eingabeStil: React.CSSProperties = {
+  minHeight: 38,
+  padding: "0 10px",
+  border: "1px solid var(--c-neutral-300)",
+  borderRadius: 4,
+  fontSize: "0.84rem",
+  background: "var(--c-white)",
+  width: "100%",
 };
 
 function Meldung({ ergebnis }: { ergebnis: AktionsErgebnis | null }) {
@@ -24,7 +37,7 @@ function Meldung({ ergebnis }: { ergebnis: AktionsErgebnis | null }) {
     <p
       role="status"
       style={{
-        margin: "12px 0 0",
+        margin: "10px 0 0",
         padding: "10px 12px",
         borderRadius: 4,
         fontSize: "0.82rem",
@@ -39,22 +52,46 @@ function Meldung({ ergebnis }: { ergebnis: AktionsErgebnis | null }) {
   );
 }
 
+function RollenSelect({
+  name,
+  defaultValue,
+  rollen,
+  id,
+}: {
+  name: string;
+  defaultValue: string;
+  rollen: RollenOption[];
+  id?: string;
+}) {
+  return (
+    <select id={id} name={name} defaultValue={defaultValue} style={{ ...eingabeStil, cursor: "pointer" }}>
+      {rollen.map((rolle) => (
+        <option key={rolle.id} value={rolle.id}>
+          {rolle.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 function MitgliedZeile({
   mitglied,
+  rollen,
   eigeneId,
   darfBearbeiten,
 }: {
   mitglied: TeamMitglied;
+  rollen: RollenOption[];
   eigeneId: string | null;
   darfBearbeiten: boolean;
 }) {
-  const [rolleErgebnis, rolleAendern, rolleLaeuft] = useActionState(aendereBenutzerRolleAction, null);
+  const [bearbeiten, setBearbeiten] = useState(false);
+  const [speichernErgebnis, speichern, speichernLaeuft] = useActionState(aktualisiereBenutzerAction, null);
   const [entfernenErgebnis, entfernen, entfernenLaeuft] = useActionState(entferneBenutzerAction, null);
   const istSelbst = mitglied.id === eigeneId;
-  const neueRolle = mitglied.rolle === "HERAUSGEBER" ? "REDAKTEUR" : "HERAUSGEBER";
 
   return (
-    <div style={{ borderTop: "1px solid var(--border-soft)", padding: "9px 0" }}>
+    <div style={{ borderTop: "1px solid var(--border-soft)", padding: "10px 0" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ flex: 1, minWidth: 180, fontSize: "0.86rem", fontWeight: 600 }}>
           {mitglied.name ?? mitglied.email}
@@ -64,25 +101,21 @@ function MitgliedZeile({
           </span>
         </span>
         <span
-          className={mitglied.rolle === "HERAUSGEBER" ? "status status-mandatory" : "status status-recommended"}
+          className={mitglied.teamVerwalten ? "status status-mandatory" : "status status-recommended"}
           style={{ minHeight: 20, padding: "0.1rem 0.4rem", fontSize: "0.54rem" }}
         >
-          {ROLLEN_LABELS[mitglied.rolle]}
+          {mitglied.rollenName}
         </span>
         {darfBearbeiten ? (
           <span style={{ display: "flex", gap: 6 }}>
-            <form action={rolleAendern}>
-              <input type="hidden" name="benutzerId" value={mitglied.id} />
-              <input type="hidden" name="rolle" value={neueRolle} />
-              <button
-                type="submit"
-                className="button button-secondary"
-                disabled={rolleLaeuft}
-                style={{ minHeight: 30, padding: "0.2rem 0.6rem", fontSize: "0.74rem" }}
-              >
-                {rolleLaeuft ? "Ändert …" : `Zu ${ROLLEN_LABELS[neueRolle]} machen`}
-              </button>
-            </form>
+            <button
+              type="button"
+              className="button button-secondary"
+              style={{ minHeight: 30, padding: "0.2rem 0.6rem", fontSize: "0.74rem" }}
+              onClick={() => setBearbeiten((wert) => !wert)}
+            >
+              {bearbeiten ? "Zuklappen" : "Bearbeiten"}
+            </button>
             <form action={entfernen}>
               <input type="hidden" name="benutzerId" value={mitglied.id} />
               <button
@@ -98,21 +131,57 @@ function MitgliedZeile({
           </span>
         ) : null}
       </div>
-      <Meldung ergebnis={rolleErgebnis ?? entfernenErgebnis} />
+      {bearbeiten && darfBearbeiten ? (
+        <form
+          action={speichern}
+          style={{
+            display: "grid",
+            gap: 10,
+            gridTemplateColumns: "1fr 1fr 1fr auto",
+            alignItems: "end",
+            marginTop: 10,
+            padding: "12px",
+            background: "var(--c-paper-blue)",
+            borderRadius: 6,
+            border: "1px solid var(--border-soft)",
+          }}
+        >
+          <input type="hidden" name="benutzerId" value={mitglied.id} />
+          <div className="form-field">
+            <label htmlFor={`name-${mitglied.id}`} style={{ fontSize: "0.74rem" }}>Name</label>
+            <input id={`name-${mitglied.id}`} name="name" type="text" defaultValue={mitglied.name ?? ""} style={eingabeStil} />
+          </div>
+          <div className="form-field">
+            <label htmlFor={`email-${mitglied.id}`} style={{ fontSize: "0.74rem" }}>E-Mail-Adresse</label>
+            <input id={`email-${mitglied.id}`} name="email" type="email" required defaultValue={mitglied.email} style={eingabeStil} />
+          </div>
+          <div className="form-field">
+            <label htmlFor={`rolle-${mitglied.id}`} style={{ fontSize: "0.74rem" }}>Rolle</label>
+            <RollenSelect id={`rolle-${mitglied.id}`} name="rolleId" defaultValue={mitglied.rolleId} rollen={rollen} />
+          </div>
+          <button type="submit" className="button button-primary" disabled={speichernLaeuft} style={{ minHeight: 38 }}>
+            {speichernLaeuft ? "Speichert …" : "Speichern"}
+          </button>
+        </form>
+      ) : null}
+      <Meldung ergebnis={speichernErgebnis ?? entfernenErgebnis} />
     </div>
   );
 }
 
 export function TeamVerwaltung({
   team,
+  rollen,
   eigeneId,
   darfBearbeiten,
 }: {
   team: TeamMitglied[];
+  rollen: RollenOption[];
   eigeneId: string | null;
   darfBearbeiten: boolean;
 }) {
   const [einladenErgebnis, einladen, einladenLaeuft] = useActionState(ladeBenutzerEinAction, null);
+  const standardRolle = rollen.find((rolle) => rolle.name === "Redakteur") ?? rollen[0];
 
   return (
     <div className="card" style={{ padding: "20px 22px" }}>
@@ -133,7 +202,13 @@ export function TeamVerwaltung({
       </p>
       <div style={{ display: "grid" }}>
         {team.map((mitglied) => (
-          <MitgliedZeile key={mitglied.id} mitglied={mitglied} eigeneId={eigeneId} darfBearbeiten={darfBearbeiten} />
+          <MitgliedZeile
+            key={mitglied.id}
+            mitglied={mitglied}
+            rollen={rollen}
+            eigeneId={eigeneId}
+            darfBearbeiten={darfBearbeiten}
+          />
         ))}
       </div>
       {darfBearbeiten ? (
@@ -154,23 +229,7 @@ export function TeamVerwaltung({
             </div>
             <div className="form-field">
               <label htmlFor="einladung-rolle">Rolle</label>
-              <select
-                id="einladung-rolle"
-                name="rolle"
-                defaultValue="REDAKTEUR"
-                style={{
-                  minHeight: 42,
-                  padding: "0 10px",
-                  border: "1px solid var(--c-neutral-300)",
-                  borderRadius: 4,
-                  fontSize: "0.86rem",
-                  background: "var(--c-white)",
-                  cursor: "pointer",
-                }}
-              >
-                <option value="REDAKTEUR">Redakteur</option>
-                <option value="HERAUSGEBER">Herausgeber</option>
-              </select>
+              <RollenSelect id="einladung-rolle" name="rolleId" defaultValue={standardRolle?.id ?? ""} rollen={rollen} />
             </div>
           </div>
           <div className="form-field">
@@ -186,7 +245,7 @@ export function TeamVerwaltung({
         </form>
       ) : (
         <p style={{ margin: "12px 0 0", fontSize: "0.78rem", color: "var(--text-muted)" }}>
-          Zugänge vergibt die Rolle Herausgeber.
+          Zugänge vergibt eine Rolle mit dem Recht „Team verwalten“.
         </p>
       )}
     </div>

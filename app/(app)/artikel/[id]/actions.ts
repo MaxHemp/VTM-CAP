@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ArtikelFormat, ArtikelStatus } from "@prisma/client";
-import { requireRolle } from "@/lib/auth";
+import { requireRecht } from "@/lib/auth";
 import { schreibeAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 import { FORMAT_LABELS, STATUS_LABELS } from "@/lib/status";
@@ -23,7 +23,7 @@ export async function aktualisiereArtikelAction(
 ): Promise<AktionsErgebnis> {
   let session;
   try {
-    session = await requireRolle("HERAUSGEBER");
+    session = await requireRecht("artikelVerwalten");
   } catch (fehler) {
     return { ok: false, meldung: fehlerMeldung(fehler, "Keine Berechtigung.") };
   }
@@ -84,7 +84,7 @@ export async function loescheArtikelAction(
 ): Promise<AktionsErgebnis> {
   let session;
   try {
-    session = await requireRolle("HERAUSGEBER");
+    session = await requireRecht("artikelVerwalten");
   } catch (fehler) {
     return { ok: false, meldung: fehlerMeldung(fehler, "Keine Berechtigung.") };
   }

@@ -29,7 +29,7 @@ describe("baueEinladungsMail", () => {
   });
 
   it("enthält Anrede, Rolle und Login-Link ohne Passwort-Versprechen", () => {
-    const mail = baueEinladungsMail({ name: "Julia Steiner", rolle: "REDAKTEUR" });
+    const mail = baueEinladungsMail({ name: "Julia Steiner", rollenName: "Redakteur" });
     expect(mail.betreff).toBe("Ihr Zugang zu VTM Studio");
     expect(mail.text).toContain("Guten Tag Julia Steiner,");
     expect(mail.text).toContain("Rolle: Redakteur");
@@ -38,7 +38,7 @@ describe("baueEinladungsMail", () => {
   });
 
   it("fällt ohne Namen auf neutrale Anrede zurück und nennt die Herausgeber-Rolle", () => {
-    const mail = baueEinladungsMail({ name: null, rolle: "HERAUSGEBER" });
+    const mail = baueEinladungsMail({ name: null, rollenName: "Herausgeber" });
     expect(mail.text).toContain("Guten Tag,");
     expect(mail.text).toContain("Rolle: Herausgeber");
   });

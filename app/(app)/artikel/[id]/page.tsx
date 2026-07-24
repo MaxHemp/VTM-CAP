@@ -51,7 +51,7 @@ export default async function ArtikelDetailSeite({ params }: { params: Promise<{
     notFound();
   }
   const offenerJob = artikel.jobs[0] ?? null;
-  const darfVerwalten = session?.user.rolle === "HERAUSGEBER";
+  const darfVerwalten = Boolean(session?.user.rechte.artikelVerwalten);
 
   return (
     <section style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>

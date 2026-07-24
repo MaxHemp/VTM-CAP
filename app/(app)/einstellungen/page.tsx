@@ -1,16 +1,24 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { ladeEinstellungenFuerAnzeige } from "@/lib/einstellungen";
+import { extrahiereRechte } from "@/lib/rollen";
 import { Topbar } from "@/components/shell/Topbar";
 import { GhostEinstellungenForm, RedaktionEinstellungenForm } from "./EinstellungenFormulare";
+import { ProfilKarte } from "./ProfilKarte";
+import { RollenVerwaltung } from "./RollenVerwaltung";
 import { TeamVerwaltung } from "./TeamVerwaltung";
 
 export const dynamic = "force-dynamic";
 
 const AUDIT_LABELS: Record<string, string> = {
   BENUTZER_EINGELADEN: "Benutzer eingeladen",
+  BENUTZER_AKTUALISIERT: "Benutzerzugang aktualisiert",
   BENUTZER_ROLLE_GEAENDERT: "Benutzerrolle geändert",
   BENUTZER_ENTFERNT: "Benutzerzugang entfernt",
+  PROFIL_AKTUALISIERT: "Eigenes Profil aktualisiert",
+  ROLLE_ERSTELLT: "Rolle angelegt",
+  ROLLE_AKTUALISIERT: "Rolle geändert",
+  ROLLE_GELOESCHT: "Rolle gelöscht",
   ARTIKEL_HOCHGELADEN: "Artikel hochgeladen",
   ARTIKEL_BEARBEITET: "Artikel bearbeitet",
   ARTIKEL_GELOESCHT: "Artikel gelöscht",
@@ -28,9 +36,13 @@ const AUDIT_LABELS: Record<string, string> = {
 
 export default async function EinstellungenSeite() {
   const session = await auth();
-  const darfBearbeiten = session?.user.rolle === "HERAUSGEBER";
+  const rechte = extrahiereRechte(session?.user.rechte);
   const einstellungen = await ladeEinstellungenFuerAnzeige();
-  const team = await prisma.user.findMany({ orderBy: { name: "asc" } });
+  const team = await prisma.user.findMany({ orderBy: { name: "asc" }, include: { rolle: true } });
+  const rollen = await prisma.benutzerRolle.findMany({
+    orderBy: [{ istSystem: "desc" }, { name: "asc" }],
+    include: { _count: { select: { benutzer: true } } },
+  });
   const auditEintraege = await prisma.auditLog.findMany({
     orderBy: { createdAt: "desc" },
     take: 14,
@@ -57,28 +69,50 @@ export default async function EinstellungenSeite() {
             alignItems: "start",
           }}
         >
+          {session?.user ? (
+            <ProfilKarte
+              name={session.user.name ?? null}
+              email={session.user.email ?? ""}
+              rollenName={session.user.rolle}
+            />
+          ) : null}
           <GhostEinstellungenForm
             ghostUrl={einstellungen.ghostUrl}
             keyMaskiert={einstellungen.ghostAdminApiKeyMaskiert}
             letzterAbgleich={letzterAbgleich}
-            darfBearbeiten={darfBearbeiten}
+            darfBearbeiten={rechte.einstellungenVerwalten}
           />
           <RedaktionEinstellungenForm
             anthropicKeyMaskiert={einstellungen.anthropicApiKeyMaskiert}
             ctaStandardUrl={einstellungen.ctaStandardUrl}
             ctaStandardLabel={einstellungen.ctaStandardLabel}
-            darfBearbeiten={darfBearbeiten}
+            darfBearbeiten={rechte.einstellungenVerwalten}
           />
           <TeamVerwaltung
             team={team.map((mitglied) => ({
               id: mitglied.id,
               name: mitglied.name,
               email: mitglied.email,
-              rolle: mitglied.rolle,
+              rolleId: mitglied.rolleId,
+              rollenName: mitglied.rolle.name,
+              teamVerwalten: mitglied.rolle.teamVerwalten,
             }))}
+            rollen={rollen.map((rolle) => ({ id: rolle.id, name: rolle.name }))}
             eigeneId={session?.user.id ?? null}
-            darfBearbeiten={darfBearbeiten}
+            darfBearbeiten={rechte.teamVerwalten}
           />
+          {rechte.teamVerwalten ? (
+            <RollenVerwaltung
+              rollen={rollen.map((rolle) => ({
+                id: rolle.id,
+                name: rolle.name,
+                beschreibung: rolle.beschreibung,
+                istSystem: rolle.istSystem,
+                benutzerAnzahl: rolle._count.benutzer,
+                rechte: extrahiereRechte(rolle),
+              }))}
+            />
+          ) : null}
           <div className="card" style={{ padding: "20px 22px" }}>
             <h3
               style={{

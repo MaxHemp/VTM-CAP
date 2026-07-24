@@ -1,7 +1,7 @@
 // Beispieldaten für das Pipeline-Board (M1) inkl. aufbereitetem
 // Review-Artikel mit Demo-Card (M2).
 // Ausführen mit: npx prisma db seed
-import { PrismaClient, ArtikelFormat, ArtikelStatus, Prisma, Rolle } from "@prisma/client";
+import { PrismaClient, ArtikelFormat, ArtikelStatus, Prisma } from "@prisma/client";
 import { baueMockCard } from "../lib/mock-card";
 import { pruefeCard } from "../lib/stilcheck";
 import { quelltextHash } from "../lib/extraktion";
@@ -16,7 +16,39 @@ const DEMO_ROHTEXT =
   "Eine Grenze bleibt: Ohne saubere Datenqualität liefert Process Mining verzerrte Ergebnisse. " +
   "Wer klein startet und schnell lernt, verschafft sich einen messbaren Vorsprung.";
 
+const ROLLE_HERAUSGEBER = "rolle-herausgeber";
+const ROLLE_REDAKTEUR = "rolle-redakteur";
+
+async function stelleSystemRollenSicher() {
+  await prisma.benutzerRolle.upsert({
+    where: { id: ROLLE_HERAUSGEBER },
+    update: {},
+    create: {
+      id: ROLLE_HERAUSGEBER,
+      name: "Herausgeber",
+      beschreibung: "Volle Verwaltung: Artikel, Publishing, Freigaben, Team und Einstellungen.",
+      istSystem: true,
+      artikelVerwalten: true,
+      publizieren: true,
+      freigabenVerwalten: true,
+      teamVerwalten: true,
+      einstellungenVerwalten: true,
+    },
+  });
+  await prisma.benutzerRolle.upsert({
+    where: { id: ROLLE_REDAKTEUR },
+    update: {},
+    create: {
+      id: ROLLE_REDAKTEUR,
+      name: "Redakteur",
+      beschreibung: "Redaktionelle Arbeit: Manuskripte hochladen, Reviews bearbeiten, LinkedIn-Posts erstellen.",
+      istSystem: true,
+    },
+  });
+}
+
 async function main() {
+  await stelleSystemRollenSicher();
   // Optionaler echter Herausgeber-Zugang aus der Umgebung (SEED_ADMIN_EMAIL):
   // Legt den Betreiber-Account mit voller Rolle an, damit die erste Anmeldung
   // nicht als REDAKTEUR endet. Idempotent; hebt eine bestehende Rolle an.
@@ -24,11 +56,11 @@ async function main() {
   if (adminEmail) {
     await prisma.user.upsert({
       where: { email: adminEmail },
-      update: { rolle: Rolle.HERAUSGEBER },
+      update: { rolleId: ROLLE_HERAUSGEBER },
       create: {
         email: adminEmail,
         name: process.env.SEED_ADMIN_NAME?.trim() || adminEmail.split("@")[0],
-        rolle: Rolle.HERAUSGEBER,
+        rolleId: ROLLE_HERAUSGEBER,
       },
     });
     console.log(`Herausgeber-Zugang sichergestellt: ${adminEmail}`);
@@ -59,7 +91,7 @@ async function main() {
     create: {
       email: "herausgeber@vtm-studio.example",
       name: "Max Brenner",
-      rolle: Rolle.HERAUSGEBER,
+      rolleId: ROLLE_HERAUSGEBER,
     },
   });
 
@@ -69,7 +101,7 @@ async function main() {
     create: {
       email: "redaktion@vtm-studio.example",
       name: "Julia Steiner",
-      rolle: Rolle.REDAKTEUR,
+      rolleId: ROLLE_REDAKTEUR,
     },
   });
 

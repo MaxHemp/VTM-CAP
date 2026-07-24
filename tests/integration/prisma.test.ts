@@ -18,11 +18,14 @@ describe.skipIf(!aktiv)("Prisma-Schema gegen PostgreSQL", () => {
     await prisma.$disconnect();
   });
 
-  it("legt Benutzer mit Standardrolle REDAKTEUR an", async () => {
+  it("legt Benutzer mit Standardrolle Redakteur an (Systemrolle aus der Migration)", async () => {
     const user = await prisma.user.create({
       data: { email: "redakteur@integration.test", name: "Integration Redakteur" },
+      include: { rolle: true },
     });
-    expect(user.rolle).toBe("REDAKTEUR");
+    expect(user.rolleId).toBe("rolle-redakteur");
+    expect(user.rolle.name).toBe("Redakteur");
+    expect(user.rolle.teamVerwalten).toBe(false);
   });
 
   it("legt Artikel mit Default-Status EINGEGANGEN an und liest ihn zurück (Roundtrip)", async () => {

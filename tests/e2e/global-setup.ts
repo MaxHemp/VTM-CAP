@@ -15,8 +15,8 @@ export default async function globalSetup() {
   try {
     const benutzer = await prisma.user.upsert({
       where: { email: E2E_BENUTZER.email },
-      update: { rolle: "HERAUSGEBER" },
-      create: { email: E2E_BENUTZER.email, name: E2E_BENUTZER.name, rolle: "HERAUSGEBER" },
+      update: { rolleId: "rolle-herausgeber" },
+      create: { email: E2E_BENUTZER.email, name: E2E_BENUTZER.name, rolleId: "rolle-herausgeber" },
     });
     const zielVerzeichnis = path.join(__dirname, ".auth");
     mkdirSync(zielVerzeichnis, { recursive: true });

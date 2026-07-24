@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth, requireRolle } from "@/lib/auth";
+import { auth, requireRecht } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { schreibeAuditLog } from "@/lib/audit";
 import { ersetzeAbschnitt, ersetzeTextbloecke, parseAbschnitte } from "@/lib/card-abschnitte";
@@ -119,7 +119,7 @@ export async function erstelleGhostDraftAction(
 ): Promise<GhostDraftAktionErgebnis> {
   let session;
   try {
-    session = await requireRolle("HERAUSGEBER");
+    session = await requireRecht("publizieren");
   } catch (fehler) {
     return { ok: false, meldung: fehler instanceof Error ? fehler.message : "Keine Berechtigung." };
   }

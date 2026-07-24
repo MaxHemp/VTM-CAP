@@ -59,26 +59,42 @@ async function provisioniereAdminKey(): Promise<string> {
   }
 
   // Integration + Admin API Key programmatisch anlegen
-  const integrationAntwort = await fetch(`${GHOST_URL}/ghost/api/admin/integrations/?include=api_keys`, {
+  const sessionCookie = cookie.split(";")[0]!;
+  const integrationName = `vtm-studio-test-${Date.now()}`;
+  const integrationAntwort = await fetch(`${GHOST_URL}/ghost/api/admin/integrations/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Origin: GHOST_URL,
-      Cookie: cookie.split(";")[0]!,
+      Cookie: sessionCookie,
     },
-    body: JSON.stringify({ integrations: [{ name: `vtm-studio-test-${Date.now()}` }] }),
+    body: JSON.stringify({ integrations: [{ name: integrationName }] }),
   });
   if (!integrationAntwort.ok) {
     throw new Error(
       `Integration konnte nicht angelegt werden (HTTP ${integrationAntwort.status}): ${await integrationAntwort.text()}`
     );
   }
-  const daten = (await integrationAntwort.json()) as {
-    integrations: Array<{ api_keys: Array<{ type: string; id: string; secret: string }> }>;
+
+  // Die POST-Antwort enthält die api_keys nicht zwingend mit Secret –
+  // deshalb die Integration per GET mit include=api_keys nachladen.
+  const listeAntwort = await fetch(`${GHOST_URL}/ghost/api/admin/integrations/?include=api_keys&limit=all`, {
+    headers: { Origin: GHOST_URL, Cookie: sessionCookie },
+  });
+  if (!listeAntwort.ok) {
+    throw new Error(`Integrationen konnten nicht geladen werden (HTTP ${listeAntwort.status}).`);
+  }
+  const daten = (await listeAntwort.json()) as {
+    integrations: Array<{ name: string; api_keys?: Array<{ type: string; id: string; secret?: string }> }>;
   };
-  const adminKey = daten.integrations[0]?.api_keys.find((key) => key.type === "admin");
-  if (!adminKey) {
-    throw new Error("Die Integration enthält keinen Admin API Key.");
+  const integration = daten.integrations.find((eintrag) => eintrag.name === integrationName);
+  const adminKey = integration?.api_keys?.find((key) => key.type === "admin");
+  if (!adminKey?.secret || !/^[0-9a-f]+$/i.test(adminKey.secret)) {
+    throw new Error(
+      `Die Integration liefert keinen brauchbaren Admin API Key. Erhalten: ${JSON.stringify(
+        integration?.api_keys?.map((key) => ({ type: key.type, id: key.id, secretLaenge: key.secret?.length ?? 0 }))
+      )}`
+    );
   }
   return `${adminKey.id}:${adminKey.secret}`;
 }

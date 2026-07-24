@@ -1,0 +1,32 @@
+# Optionale lokale Entwicklungsumgebung (Postgres + Ghost).
+# Wird in der Claude-Code-Sandbox NIE ausgeführt – dort laufen Build, Lint,
+# Typecheck und Unit-Tests ohne Container. Integrationstests laufen in
+# GitHub Actions gegen Service-Container (siehe .github/workflows/ci.yml).
+#
+# Lokaler Start:  docker compose up -d
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: vtm
+      POSTGRES_PASSWORD: vtm
+      POSTGRES_DB: vtm_studio
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  ghost:
+    image: ghost:5-alpine
+    environment:
+      # Entwicklungsmodus: Ghost nutzt SQLite, keine weitere DB nötig
+      NODE_ENV: development
+      url: http://localhost:2368
+    ports:
+      - "2368:2368"
+    volumes:
+      - ghost-data:/var/lib/ghost/content
+
+volumes:
+  postgres-data:
+  ghost-data:

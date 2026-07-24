@@ -30,12 +30,35 @@ export interface FaktencheckClaim {
   quelle: string | null;
 }
 
+export interface PublishVorschlaege {
+  headlines: string[];
+  excerpts: string[];
+}
+
+export const EXCERPT_MAX_ZEICHEN = 300;
+
+// Kürzt einen Excerpt hart auf das Ghost-Limit (satzweise, dann Wortgrenze).
+export function kuerzeExcerpt(text: string, maxZeichen = EXCERPT_MAX_ZEICHEN): string {
+  const bereinigt = text.replace(/\s+/g, " ").trim();
+  if (bereinigt.length <= maxZeichen) {
+    return bereinigt;
+  }
+  const gekuerzt = bereinigt.slice(0, maxZeichen + 1);
+  const letzterSatz = Math.max(gekuerzt.lastIndexOf(". "), gekuerzt.lastIndexOf("! "), gekuerzt.lastIndexOf("? "));
+  if (letzterSatz > maxZeichen * 0.5) {
+    return gekuerzt.slice(0, letzterSatz + 1).trim();
+  }
+  const letztesWort = gekuerzt.lastIndexOf(" ");
+  return gekuerzt.slice(0, letztesWort > 0 ? letztesWort : maxZeichen).trim();
+}
+
 // Interface bewusst so geschnitten, dass eine spätere Recherche-Stufe
 // (Websuche) als weitere Implementierung andocken kann (Nicht-Ziel v1).
 export interface KiSchicht {
   generiereCard(briefing: CardBriefing, rohtext: string): Promise<string>;
   bewerteQualitaet(cardText: string, briefing: CardBriefing): Promise<QualitaetsScore>;
   extrahiereFakten(rohtext: string, cardText: string): Promise<FaktencheckClaim[]>;
+  generierePublishVorschlaege(cardText: string, titel: string): Promise<PublishVorschlaege>;
 }
 
 export const SCORE_KATEGORIEN: Array<{ kuerzel: string; name: string }> = [
@@ -157,6 +180,29 @@ class AnthropicKiSchicht implements KiSchicht {
         quelle: claim.quelle || null,
       }));
   }
+
+  async generierePublishVorschlaege(cardText: string, titel: string): Promise<PublishVorschlaege> {
+    const antwort = await this.client.messages.create({
+      model: KI_MODELL,
+      max_tokens: 4000,
+      thinking: { type: "adaptive" },
+      system:
+        "Du bist die Schlussredaktion des VersicherungsTech Magazins. Erzeuge für den Artikel exakt 2 Headline-Vorschläge " +
+        "(präzise, ohne Clickbait, keine Em-Dashes, keine Buzzwords) und exakt 3 Excerpt-Varianten (je maximal 300 Zeichen, " +
+        "Sie-Form, Kernaussage zuerst). " +
+        'Antworte ausschließlich mit JSON: {"headlines":["...","..."],"excerpts":["...","...","..."]}',
+      messages: [{ role: "user", content: `Arbeitstitel: ${titel}\n\nArtikeltext:\n\n${cardText}` }],
+    });
+    const text = antwort.content
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("");
+    const daten = extrahiereJson<PublishVorschlaege>(text);
+    return {
+      headlines: (daten.headlines ?? []).filter(Boolean).slice(0, 2),
+      excerpts: (daten.excerpts ?? []).filter(Boolean).slice(0, 3).map((excerpt) => kuerzeExcerpt(excerpt)),
+    };
+  }
 }
 
 class MockKiSchicht implements KiSchicht {
@@ -195,6 +241,22 @@ class MockKiSchicht implements KiSchicht {
       klassifikation: klassifikationen[index] ?? "ABLEITUNG",
       quelle: index === 0 ? "Angabe laut Manuskript" : null,
     }));
+  }
+
+  async generierePublishVorschlaege(cardText: string, titel: string): Promise<PublishVorschlaege> {
+    const saetze = cardText
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+/)
+      .filter((satz) => satz.trim().length > 30);
+    const basis = saetze.slice(0, 3).join(" ") || titel;
+    return {
+      headlines: [`${titel}: Was jetzt zu tun ist`, `${titel} in der Analyse`],
+      excerpts: [
+        kuerzeExcerpt(basis),
+        kuerzeExcerpt(`Die wichtigsten Erkenntnisse kompakt: ${basis}`),
+        kuerzeExcerpt(`Für IT-Entscheider eingeordnet: ${basis}`),
+      ],
+    };
   }
 }
 

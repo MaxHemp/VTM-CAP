@@ -4,7 +4,7 @@ Interne Redaktionsplattform des **VersicherungsTech Magazins (VTM)**. VTM Studio
 
 Auftrag und Meilensteinplan: `PROMPT_Claude_Code_VTM_Studio.md` · Umsetzungsplan M1: `docs/PLAN_M1.md`
 
-**Stand: Meilenstein M2 (Artikel-Pipeline)** – zusätzlich zu M1 (Fundament, Auth, Pipeline-Board, Einstellungen): Manuskript-Upload (DOCX/PDF/MD/TXT) mit Briefing, Verarbeitungsjob mit Stepper (Extraktion → Card-Generierung → Checks → Persistenz), Stilcheck-Port (`lib/stilcheck.ts`, deckungsgleich zu `brand-rules/scripts/stilcheck.py`), LLM-Qualitätsscore (8 Kategorien, Schwelle 13/16), Faktencheck-Extraktion (BELEGT/ABLEITUNG/PROGNOSE) und Review-Screen (Outline, Web-/Outlook-Preview, Prüf-Panel, Inline-Bearbeitung mit erneuter Prüfung). Ghost-Publishing (M3), LinkedIn Studio (M4) und Sponsored-Freigabe (M5) folgen.
+**Stand: Meilenstein M3 (Ghost-Publishing)** – zusätzlich zu M1 (Fundament) und M2 (Artikel-Pipeline mit Upload, Verarbeitungsjob, Stilcheck-Port, Review-Screen): Publish-Modal mit 2 KI-Headline-Vorschlägen, 3 Excerpt-Varianten (Zeichenzähler ≤ 300), Tags und Feature-Image-Upload. Der Draft wird über die Ghost Admin API als **Lexical-Dokument mit genau einer html-Card-Node** angelegt (nie über `?source=html` – das würde die Inline-Styles zerstören) und bleibt bewusst immer nur ein Draft. Erfolg: `ghostDraftUrl` gespeichert, Status IN_GHOST, Link im UI. LinkedIn Studio (M4) und Sponsored-Freigabe (M5) folgen.
 
 ### KI-Betrieb (M2)
 
@@ -72,8 +72,9 @@ Secrets liegen ausschließlich in `.env` bzw. als Vercel/GitHub-Actions-Secrets 
 ## Qualität
 
 - CI (`.github/workflows/ci.yml`): Job `check` (install, lint, typecheck, build, Unit-Tests) bei jedem Push/PR; Job `integration` mit Service-Containern `postgres:16` und `ghost:5-alpine`. Grüne CI ist Merge-Bedingung.
-- Unit-Tests (Vitest, DB-frei): Verschlüsselung (Roundtrip, Manipulationserkennung), Ghost-JWT und Verbindungstest (gemocktes `fetch`), Board-Gruppierung
-- Ab M2/M3 kommen hinzu: `lib/stilcheck.ts` (deckungsgleich zu `brand-rules/scripts/stilcheck.py`), Excerpt-Längen, Lexical-Payload-Builder, Ghost-Draft-Integrationstest, Playwright-E2E-Happy-Path
+- Unit-Tests (Vitest, DB-frei): Verschlüsselung, Ghost-JWT/Verbindungstest, Board-Gruppierung, Stilcheck-Fixtures (deckungsgleich zum Python-Original), Abschnitts-Parser, Preview-Transformationen, Lexical-Payload-Builder, Excerpt-Längen
+- Integrationstests (nur GitHub Actions): Prisma-Roundtrip gegen `postgres:16`; Ghost-Draft gegen `ghost:5-alpine` – die Instanz provisioniert sich selbst (Setup-Endpoint, Session-Login, Integration + Admin API Key programmatisch) und verifiziert, dass die Card **unverändert** als einzige html-Card-Node im Lexical-Dokument liegt
+- E2E (Playwright, CI-Job `e2e`): Happy-Path Upload → Verarbeitung → Review → Publish-Modal → Draft gegen die lokal gestartete App mit `MOCK_KI=1` und `MOCK_GHOST=1`
 
 ## Screenshots
 

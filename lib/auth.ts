@@ -32,6 +32,9 @@ async function sendeMagicLink(params: { identifier: string; url: string }) {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
+  // Self-Hosting (Vercel/eigener Server): Host aus APP_URL bzw. Request
+  // akzeptieren; ohne dies lehnt Auth.js Produktions-Requests ab.
+  trustHost: true,
   pages: {
     signIn: "/login",
     verifyRequest: "/login?status=link-versendet",

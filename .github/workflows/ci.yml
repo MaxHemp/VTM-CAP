@@ -95,3 +95,47 @@ jobs:
           exit 1
       - name: Integrationstests
         run: npm run test:integration
+
+  e2e:
+    name: e2e (Playwright, gemockte Ghost-/KI-Schicht)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: vtm
+          POSTGRES_PASSWORD: vtm
+          POSTGRES_DB: vtm_studio_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vtm"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://vtm:vtm@localhost:5432/vtm_studio_e2e
+      AUTH_SECRET: e2e-nur-fuer-tests
+      ENCRYPTION_SECRET: e2e-nur-fuer-tests
+      APP_URL: http://localhost:3000
+      MOCK_KI: "1"
+      MOCK_GHOST: "1"
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Abhängigkeiten installieren
+        run: npm ci
+      - name: Prisma-Client generieren
+        run: npx prisma generate
+      - name: Migrationen anwenden
+        run: npx prisma migrate deploy
+      - name: Chromium installieren
+        run: npx playwright install --with-deps chromium
+      - name: Build
+        run: npm run build
+      - name: E2E-Happy-Path
+        run: npm run test:e2e

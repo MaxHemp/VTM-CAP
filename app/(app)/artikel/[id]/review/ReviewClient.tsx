@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { FaktencheckClaim, QualitaetsScore } from "@/lib/ki";
 import type { StilcheckErgebnis } from "@/lib/stilcheck";
 import { aktualisiereAbschnittAction } from "./actions";
+import { PublishModal } from "./PublishModal";
 
 interface ReviewArtikel {
   id: string;
@@ -15,6 +16,7 @@ interface ReviewArtikel {
   kunde: string | null;
   qualitaetsScore: number | null;
   status: string;
+  ghostDraftUrl: string | null;
 }
 
 interface ReviewAbschnitt {
@@ -41,6 +43,8 @@ export function ReviewClient({
   stilcheck,
   score,
   claims,
+  ghostVerbunden,
+  tagsVorschlag,
 }: {
   artikel: ReviewArtikel;
   abschnitte: ReviewAbschnitt[];
@@ -49,11 +53,14 @@ export function ReviewClient({
   stilcheck: StilcheckErgebnis | null;
   score: QualitaetsScore | null;
   claims: FaktencheckClaim[];
+  ghostVerbunden: boolean;
+  tagsVorschlag: string[];
 }) {
   const router = useRouter();
   const [ansicht, setAnsicht] = useState<"web" | "outlook">("web");
   const [tab, setTab] = useState<Tab>("qualitaet");
   const [bearbeiteAbschnitt, setBearbeiteAbschnitt] = useState<ReviewAbschnitt | null>(null);
+  const [publishOffen, setPublishOffen] = useState(false);
   const [entwuerfe, setEntwuerfe] = useState<Map<number, string>>(new Map());
   const [meldung, setMeldung] = useState<{ ok: boolean; text: string } | null>(null);
   const [speichert, startTransition] = useTransition();
@@ -155,9 +162,25 @@ export function ReviewClient({
         <button className="button button-secondary" disabled title="Verfügbar ab Meilenstein M4" style={{ minHeight: 38, padding: "0.4rem 0.9rem", fontSize: "0.86rem" }}>
           LinkedIn-Post erstellen
         </button>
-        <button className="button button-primary" disabled title="Verfügbar ab Meilenstein M3" style={{ minHeight: 38, padding: "0.4rem 0.9rem", fontSize: "0.86rem" }}>
-          Nach Ghost übertragen
-        </button>
+        {artikel.ghostDraftUrl ? (
+          <a
+            href={artikel.ghostDraftUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="button button-secondary"
+            style={{ minHeight: 38, padding: "0.4rem 0.9rem", fontSize: "0.86rem" }}
+          >
+            Draft in Ghost öffnen
+          </a>
+        ) : (
+          <button
+            className="button button-primary"
+            onClick={() => setPublishOffen(true)}
+            style={{ minHeight: 38, padding: "0.4rem 0.9rem", fontSize: "0.86rem" }}
+          >
+            Nach Ghost übertragen
+          </button>
+        )}
       </header>
 
       <div style={{ display: "grid", gridTemplateColumns: "250px minmax(460px, 1fr) 338px", flex: 1, minHeight: 0, overflowX: "auto" }}>
@@ -447,6 +470,16 @@ export function ReviewClient({
           </div>
         </aside>
       </div>
+
+      {publishOffen ? (
+        <PublishModal
+          artikelId={artikel.id}
+          initialHeadline={artikel.titel}
+          initialTags={tagsVorschlag}
+          ghostVerbunden={ghostVerbunden}
+          onSchliessen={() => setPublishOffen(false)}
+        />
+      ) : null}
 
       {/* Abschnitts-Editor */}
       {bearbeiteAbschnitt ? (

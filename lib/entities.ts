@@ -44,3 +44,11 @@ export function dekodiereEntities(eingabe: string): string {
 export function kodiereNichtAscii(eingabe: string): string {
   return eingabe.replace(/[^\x20-\x7e\n\t]/g, (zeichen) => `&#${zeichen.codePointAt(0)};`);
 }
+
+// Extrahiert den lesbaren Fließtext aus HTML (Tags entfernen, Entities
+// dekodieren, Whitespace normalisieren).
+export function htmlZuText(html: string): string {
+  return dekodiereEntities(html.replace(/<[^>]+>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
+}

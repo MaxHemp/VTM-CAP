@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { ladeEinstellungenFuerAnzeige } from "@/lib/einstellungen";
 import { parseAbschnitte, extrahiereTextbloecke } from "@/lib/card-abschnitte";
 import { baueOutlookPreview, baueWebPreview } from "@/lib/preview";
 import { FORMAT_LABELS } from "@/lib/status";
@@ -25,6 +26,15 @@ export default async function ReviewSeite({ params }: { params: Promise<{ id: st
     textbloecke: extrahiereTextbloecke(abschnitt.html),
   }));
 
+  const einstellungen = await ladeEinstellungenFuerAnzeige();
+  const ghostVerbunden =
+    process.env.MOCK_GHOST === "1" || (einstellungen.letzterGhostStatus ?? "").includes("OK");
+  const tagsVorschlag = [
+    ...(artikel.kategorie ? [artikel.kategorie] : []),
+    FORMAT_LABELS[artikel.format],
+    ...(artikel.sponsored ? ["Anzeige"] : []),
+  ];
+
   return (
     <ReviewClient
       artikel={{
@@ -35,6 +45,7 @@ export default async function ReviewSeite({ params }: { params: Promise<{ id: st
         kunde: artikel.kunde,
         qualitaetsScore: artikel.qualitaetsScore,
         status: artikel.status,
+        ghostDraftUrl: artikel.ghostDraftUrl,
       }}
       abschnitte={abschnitte}
       webPreview={baueWebPreview(artikel.cardHtml, artikel.titel)}
@@ -42,6 +53,8 @@ export default async function ReviewSeite({ params }: { params: Promise<{ id: st
       stilcheck={(artikel.stilcheckFindings as unknown as StilcheckErgebnis) ?? null}
       score={(artikel.scoreDetails as unknown as QualitaetsScore) ?? null}
       claims={(artikel.faktencheckClaims as unknown as FaktencheckClaim[]) ?? []}
+      ghostVerbunden={ghostVerbunden}
+      tagsVorschlag={tagsVorschlag}
     />
   );
 }

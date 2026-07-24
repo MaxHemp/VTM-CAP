@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { extrahiereText, quelltextHash } from "@/lib/extraktion";
 import { ladeKiSchicht } from "@/lib/ki";
 import { pruefeCard } from "@/lib/stilcheck";
-import { dekodiereEntities } from "@/lib/entities";
+import { htmlZuText } from "@/lib/entities";
 import { ladeEinstellungenFuerAnzeige } from "@/lib/einstellungen";
 import { schreibeAuditLog } from "@/lib/audit";
 import type { CardBriefing } from "@/lib/brand-prompt";
@@ -65,11 +65,7 @@ function leseInfos(job: Job): Map<number, string> {
   return infos;
 }
 
-function cardZuText(cardHtml: string): string {
-  return dekodiereEntities(cardHtml.replace(/<[^>]+>/g, " "))
-    .replace(/\s+/g, " ")
-    .trim();
-}
+const cardZuText = htmlZuText;
 
 // Führt genau einen Verarbeitungsschritt aus und gibt den aktualisierten Job
 // zurück. Idempotent gegenüber fertigen/fehlgeschlagenen Jobs.

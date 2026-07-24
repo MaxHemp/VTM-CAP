@@ -9,6 +9,9 @@ next-env.d.ts
 
 # Tests & Coverage
 /coverage
+/test-results
+/playwright-report
+tests/e2e/.auth/
 
 # Secrets – niemals committen; nur .env.example gehört ins Repo
 .env

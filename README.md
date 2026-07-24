@@ -4,7 +4,22 @@ Interne Redaktionsplattform des **VersicherungsTech Magazins (VTM)**. VTM Studio
 
 Auftrag und Meilensteinplan: `PROMPT_Claude_Code_VTM_Studio.md` · Umsetzungsplan M1: `docs/PLAN_M1.md`
 
-**Stand: Meilenstein M4 (LinkedIn Studio)** – zusätzlich zu M1 (Fundament), M2 (Artikel-Pipeline) und M3 (Ghost-Publishing als Lexical-html-Card-Draft): Post-Generator mit Kanal-Umschalter (**VTM-Kanal**: Sie-Form, These-Hook, genau 3 ▪️-Bullets als vollständige Sätze, Abschluss „Jetzt lesen und mitdiskutieren.“, 5 Hashtags, keine Em-Dashes/Emojis außer ▪️; **Personal**: Du-Form, gleiche Faktentreue) mit 2–3 Varianten, Copy-Button und Zeichenzähler. Beitragsbild-Generator mit drei SVG-Templates im VTM-CI (Cobalt-Verlauf, Gold-Signaturstrich, Serifen-Headline, Datenraster, VTM-Wortmarke; bei Sponsored Kennzeichnungszeile in Gold), Formate 1200×630 und 1080×1080, editierbare Titel-/Unterzeile mit Live-Vorschau und PNG-Export in 2-facher Auflösung (`sharp`). Direktes LinkedIn-Posting ist bewusst nicht angebunden (`lib/linkedin.ts` als gekapselter Stub). Sponsored-Freigabe (M5) folgt.
+**Stand: Meilenstein M5 – alle Meilensteine umgesetzt.** M1 Fundament (Auth, App-Shell, Pipeline-Board, Einstellungen mit Ghost-Verbindungstest und verschlüsselter Key-Ablage) · M2 Artikel-Pipeline (Upload, Verarbeitungsjob mit Stepper, Stilcheck-Port, LLM-Score 13/16, Faktencheck, Review-Screen mit Web-/Outlook-Preview und Inline-Bearbeitung) · M3 Ghost-Publishing (Publish-Modal, Draft als Lexical-Dokument mit genau einer html-Card-Node, Feature-Image-Upload, Status IN_GHOST) · M4 LinkedIn Studio (Post-Generator VTM/Personal, SVG-Beitragsbilder mit PNG-Export 2x) · M5 Sponsored-Freigabe (tokenisierte Kundenansicht `/freigabe/[token]` ohne Account, Diff Kundentext ↔ Card-Fließtext mit Typografie-Normalisierung und Badge „Text 1:1 übernommen“, Kommentar, Freigeben/Änderung anfragen, E-Mail-Benachrichtigung an den Herausgeber, AuditLog-Ansicht, Empty/Loading/Error-States, Responsive-Pass).
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Pipeline](docs/screenshots/pipeline.png) | ![Artikel-Review](docs/screenshots/review.png) |
+| Pipeline-Kanban | Artikel-Review (Outline · Preview · Prüf-Panel) |
+| ![Upload](docs/screenshots/upload.png) | ![Ghost-Publish-Modal](docs/screenshots/publish-modal.png) |
+| Upload mit Briefing | Ghost-Publish-Modal |
+| ![LinkedIn Studio](docs/screenshots/linkedin-studio.png) | ![Sponsored-Freigabe](docs/screenshots/freigabe.png) |
+| LinkedIn Studio mit Bild-Generator | Kundenansicht Sponsored-Freigabe |
+| ![Einstellungen](docs/screenshots/einstellungen.png) | |
+| Einstellungen mit Audit-Log | |
+
+Die Screenshots entstehen reproduzierbar über `npx tsx scripts/screenshots.ts` gegen die lokal gestartete App (Seed-Daten, `MOCK_KI=1`).
 
 ### KI-Betrieb (M2)
 

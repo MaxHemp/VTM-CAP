@@ -192,16 +192,7 @@ export function UploadForm({ ctaHinweis }: { ctaHinweis: string }) {
   }
 
   return (
-    <form
-      action={starteVerarbeitung}
-      style={{
-        display: "grid",
-        gridTemplateColumns: "minmax(0, 1.1fr) minmax(0, 1fr)",
-        gap: 22,
-        maxWidth: 1160,
-        alignItems: "start",
-      }}
-    >
+    <form action={starteVerarbeitung} className="upload-grid">
       <div className="card" style={{ padding: 22 }}>
         <div
           style={{

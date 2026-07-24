@@ -56,6 +56,26 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--focus) !important;
   box-shadow: 0 0 0 3px rgb(36 104 232 / 0.16);
 }
+@keyframes vtm-spin {
+  to { transform: rotate(360deg); }
+}
+/* Responsive-Pass (M5): mehrspaltige Arbeitsflächen brechen auf schmalen
+   Viewports auf eine Spalte um. */
+.review-grid { display: grid; grid-template-columns: 250px minmax(460px, 1fr) 338px; }
+.upload-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; max-width: 1160px; align-items: start; }
+.studio-grid { display: grid; grid-template-columns: minmax(380px, 1fr) 440px; gap: 22px; max-width: 1240px; align-items: start; }
+@media (max-width: 1180px) {
+  .review-grid { grid-template-columns: 220px minmax(0, 1fr); }
+  .review-grid > aside:last-child { grid-column: 1 / -1; border-left: none; border-top: 1px solid var(--border-soft); }
+  .studio-grid { grid-template-columns: 1fr; }
+  .studio-grid > .card:last-child { position: static !important; }
+}
+@media (max-width: 860px) {
+  .review-grid { grid-template-columns: 1fr; }
+  .review-grid > aside:first-child { border-right: none; border-bottom: 1px solid var(--border-soft); }
+  .upload-grid { grid-template-columns: 1fr; }
+  .freigabe-diff { grid-template-columns: 1fr !important; }
+}
 @keyframes vtm-step-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgb(36 104 232 / 0.35); }
   50% { box-shadow: 0 0 0 8px rgb(36 104 232 / 0); }

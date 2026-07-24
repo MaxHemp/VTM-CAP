@@ -11,11 +11,33 @@ const ROLLEN_LABELS: Record<string, string> = {
   REDAKTEUR: "Redakteur",
 };
 
+const AUDIT_LABELS: Record<string, string> = {
+  ARTIKEL_HOCHGELADEN: "Artikel hochgeladen",
+  ARTIKEL_AUFBEREITET: "Artikel aufbereitet (Review)",
+  ARTIKEL_ABSCHNITT_BEARBEITET: "Abschnitt bearbeitet und neu geprüft",
+  GHOST_DRAFT_ERSTELLT: "Ghost-Draft erstellt",
+  LINKEDIN_POSTS_GENERIERT: "LinkedIn-Posts generiert",
+  FREIGABELINK_ERSTELLT: "Freigabelink erstellt",
+  FREIGABE_ERTEILT: "Kundenfreigabe erteilt",
+  FREIGABE_AENDERUNG_ANGEFRAGT: "Änderung vom Kunden angefragt",
+  EINSTELLUNGEN_GHOST_GESPEICHERT: "Ghost-Einstellungen gespeichert",
+  EINSTELLUNGEN_GHOST_VERBINDUNGSTEST: "Ghost-Verbindungstest ausgeführt",
+  EINSTELLUNGEN_REDAKTION_GESPEICHERT: "Redaktionseinstellungen gespeichert",
+};
+
 export default async function EinstellungenSeite() {
   const session = await auth();
   const darfBearbeiten = session?.user.rolle === "HERAUSGEBER";
   const einstellungen = await ladeEinstellungenFuerAnzeige();
   const team = await prisma.user.findMany({ orderBy: { name: "asc" } });
+  const auditEintraege = await prisma.auditLog.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 14,
+    include: {
+      user: { select: { name: true, email: true } },
+      artikel: { select: { titel: true } },
+    },
+  });
 
   const letzterAbgleich = einstellungen.letzterGhostAbgleich
     ? `${einstellungen.letzterGhostAbgleich.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })} · ${einstellungen.letzterGhostStatus ?? ""}`
@@ -125,6 +147,62 @@ export default async function EinstellungenSeite() {
               ))}
             </div>
           </div>
+        </div>
+        <div className="card" style={{ padding: "20px 22px", maxWidth: 1160 }}>
+          <h3
+            style={{
+              margin: "0 0 14px",
+              fontFamily: "var(--font-display)",
+              fontSize: "1rem",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Audit-Log
+          </h3>
+          {auditEintraege.length === 0 ? (
+            <p style={{ margin: 0, color: "var(--text-muted)", fontSize: "0.84rem" }}>
+              Noch keine Einträge. Jede relevante Aktion (Upload, Prüfungen, Publishing, Freigaben,
+              Einstellungsänderungen) wird hier protokolliert.
+            </p>
+          ) : (
+            <div style={{ display: "grid" }}>
+              {auditEintraege.map((eintrag) => (
+                <div
+                  key={eintrag.id}
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    padding: "9px 0",
+                    borderTop: "1px solid var(--border-soft)",
+                    flexWrap: "wrap",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <span
+                    style={{
+                      flex: "none",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "0.62rem",
+                      fontWeight: 600,
+                      color: "var(--c-blue-800)",
+                    }}
+                  >
+                    {eintrag.createdAt.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}
+                  </span>
+                  <span style={{ flex: 1, minWidth: 220, fontSize: "0.84rem", color: "var(--text-primary)" }}>
+                    {AUDIT_LABELS[eintrag.aktion] ?? eintrag.aktion}
+                    {eintrag.artikel ? (
+                      <span style={{ color: "var(--text-secondary)" }}> · {eintrag.artikel.titel}</span>
+                    ) : null}
+                  </span>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text-muted)" }}>
+                    {eintrag.user?.name ?? eintrag.user?.email ?? "SYSTEM/KUNDE"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

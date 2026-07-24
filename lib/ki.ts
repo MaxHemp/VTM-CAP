@@ -54,11 +54,20 @@ export function kuerzeExcerpt(text: string, maxZeichen = EXCERPT_MAX_ZEICHEN): s
 
 // Interface bewusst so geschnitten, dass eine spätere Recherche-Stufe
 // (Websuche) als weitere Implementierung andocken kann (Nicht-Ziel v1).
+export interface LinkedInGenerierung {
+  kanal: "VTM" | "PERSONAL";
+  titel: string;
+  cardText: string;
+  sponsored: boolean;
+  kunde: string | null;
+}
+
 export interface KiSchicht {
   generiereCard(briefing: CardBriefing, rohtext: string): Promise<string>;
   bewerteQualitaet(cardText: string, briefing: CardBriefing): Promise<QualitaetsScore>;
   extrahiereFakten(rohtext: string, cardText: string): Promise<FaktencheckClaim[]>;
   generierePublishVorschlaege(cardText: string, titel: string): Promise<PublishVorschlaege>;
+  generiereLinkedInPosts(eingabe: LinkedInGenerierung): Promise<string[]>;
 }
 
 export const SCORE_KATEGORIEN: Array<{ kuerzel: string; name: string }> = [
@@ -203,6 +212,38 @@ class AnthropicKiSchicht implements KiSchicht {
       excerpts: (daten.excerpts ?? []).filter(Boolean).slice(0, 3).map((excerpt) => kuerzeExcerpt(excerpt)),
     };
   }
+
+  async generiereLinkedInPosts(eingabe: LinkedInGenerierung): Promise<string[]> {
+    const kanalRegeln =
+      eingabe.kanal === "VTM"
+        ? "Kanal: VTM-Unternehmensprofil. Regeln (hart): Sie-Form. Aufbau: These-Hook (1–2 Sätze), 1–2 Faktenabsätze, " +
+          "danach GENAU 3 Bullets, jede Zeile beginnt mit ▪️ und ist ein vollständiger Satz. " +
+          'Danach der Abschlusssatz exakt: "Jetzt lesen und mitdiskutieren." ' +
+          "Zum Schluss GENAU 5 Hashtags in einer Zeile. Keine Em-Dashes (—), keine Emojis außer ▪️."
+        : "Kanal: Persönliches Profil des Herausgebers. Regeln: Du-Form, nahbarer und direkter Ton, persönliche Einordnung, " +
+          "gleiche Faktentreue wie der Artikel (keine neuen Zahlen erfinden), 3–5 Hashtags, keine Em-Dashes, keine Emojis.";
+    const antwort = await this.client.messages.create({
+      model: KI_MODELL,
+      max_tokens: 8000,
+      thinking: { type: "adaptive" },
+      system:
+        "Du schreibst LinkedIn-Posts für das VersicherungsTech Magazin. " +
+        kanalRegeln +
+        (eingabe.sponsored
+          ? ` Der Artikel ist Sponsored Content (Kunde: ${eingabe.kunde ?? "Partner"}); kennzeichne das transparent im Post (z. B. "Anzeige").`
+          : "") +
+        ' Erzeuge 3 unterschiedliche Varianten. Antworte ausschließlich mit JSON: {"posts":["...","...","..."]}',
+      messages: [
+        { role: "user", content: `Artikeltitel: ${eingabe.titel}\n\nArtikeltext:\n\n${eingabe.cardText}` },
+      ],
+    });
+    const text = antwort.content
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("");
+    const daten = extrahiereJson<{ posts: string[] }>(text);
+    return (daten.posts ?? []).filter(Boolean).slice(0, 3);
+  }
 }
 
 class MockKiSchicht implements KiSchicht {
@@ -257,6 +298,40 @@ class MockKiSchicht implements KiSchicht {
         kuerzeExcerpt(`Für IT-Entscheider eingeordnet: ${basis}`),
       ],
     };
+  }
+
+  async generiereLinkedInPosts(eingabe: LinkedInGenerierung): Promise<string[]> {
+    const saetze = eingabe.cardText
+      .replace(/\s+/g, " ")
+      .replace(/—/g, ",")
+      .split(/(?<=[.!?])\s+/)
+      .filter((satz) => satz.trim().length > 25);
+    const satz = (index: number, fallback: string) => saetze[index]?.trim() ?? fallback;
+    const anzeige = eingabe.sponsored ? `Anzeige · In Kooperation mit ${eingabe.kunde ?? "Partner"}\n\n` : "";
+
+    if (eingabe.kanal === "VTM") {
+      const bullets = [
+        satz(2, "Die Ausgangslage ist im Artikel dokumentiert."),
+        satz(3, "Die Belege stammen aus dem Manuskript."),
+        satz(4, "Die Konsequenzen für Versicherer sind konkret benannt."),
+      ]
+        .map((inhalt) => `▪️ ${/[.!?]$/.test(inhalt) ? inhalt : `${inhalt}.`}`)
+        .join("\n");
+      const basis = (variante: string) =>
+        `${anzeige}${variante}\n\n${satz(1, "Die Faktenlage ist eindeutig.")}\n\n${bullets}\n\nJetzt lesen und mitdiskutieren.\n\n#VersicherungsTech #InsurTech #Versicherung #Digitalisierung #KI`;
+      return [
+        basis(`${eingabe.titel}: ${satz(0, "Die Kernthese steht im Artikel.")}`),
+        basis(`Was bedeutet das für Versicherer? ${satz(0, "Die Kernthese steht im Artikel.")}`),
+        basis(`Unsere Analyse: ${satz(0, "Die Kernthese steht im Artikel.")}`),
+      ];
+    }
+
+    const basisPersonal = (hook: string) =>
+      `${anzeige}${hook}\n\n${satz(1, "Die Details habe ich im Artikel aufgeschrieben.")} ${satz(2, "")}\n\nMeine Einordnung findest du im neuen VTM-Artikel.\n\n#InsurTech #Versicherung #KI`;
+    return [
+      basisPersonal(`Ich habe mir das genauer angeschaut: ${eingabe.titel}.`),
+      basisPersonal(`Kurz notiert aus der Redaktion: ${eingabe.titel}.`),
+    ];
   }
 }
 

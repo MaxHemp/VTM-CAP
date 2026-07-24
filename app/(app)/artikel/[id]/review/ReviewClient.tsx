@@ -159,9 +159,13 @@ export function ReviewClient({
         >
           SCORE {scoreWert !== null ? `${scoreWert}/16` : "—"}
         </span>
-        <button className="button button-secondary" disabled title="Verfügbar ab Meilenstein M4" style={{ minHeight: 38, padding: "0.4rem 0.9rem", fontSize: "0.86rem" }}>
+        <Link
+          href={`/linkedin?artikel=${artikel.id}`}
+          className="button button-secondary"
+          style={{ minHeight: 38, padding: "0.4rem 0.9rem", fontSize: "0.86rem" }}
+        >
           LinkedIn-Post erstellen
-        </button>
+        </Link>
         {artikel.ghostDraftUrl ? (
           <a
             href={artikel.ghostDraftUrl}

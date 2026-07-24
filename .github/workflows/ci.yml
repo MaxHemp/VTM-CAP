@@ -1,0 +1,95 @@
+# CI für VTM Studio
+# Job "check": läuft ohne Container (Sandbox-kompatibel) bei jedem Push/PR.
+# Job "integration": Service-Container postgres:16 + ghost:5-alpine für
+# DB- und (ab M3) Ghost-Integrationstests.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  check:
+    name: check (lint, typecheck, build, unit)
+    runs-on: ubuntu-latest
+    env:
+      # Platzhalter: der Build führt keine DB-Queries aus (alle Seiten dynamisch)
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      AUTH_SECRET: ci-nur-fuer-build
+      ENCRYPTION_SECRET: ci-nur-fuer-build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Abhängigkeiten installieren
+        run: npm ci
+      - name: Prisma-Client generieren
+        run: npx prisma generate
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit-Tests
+        run: npm test
+
+  integration:
+    name: integration (postgres + ghost)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: vtm
+          POSTGRES_PASSWORD: vtm
+          POSTGRES_DB: vtm_studio_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vtm"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      # Ghost-Instanz für die M3-Integrationstests (Draft als Lexical-html-Card).
+      # Entwicklungsmodus → SQLite, keine weitere Datenbank nötig. Die Tests
+      # provisionieren sich Zugangsdaten über den Setup-Endpoint selbst.
+      ghost:
+        image: ghost:5-alpine
+        env:
+          NODE_ENV: development
+          url: http://localhost:2368
+        ports:
+          - 2368:2368
+    env:
+      DATABASE_URL: postgresql://vtm:vtm@localhost:5432/vtm_studio_test
+      GHOST_URL: http://localhost:2368
+      RUN_INTEGRATION: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Abhängigkeiten installieren
+        run: npm ci
+      - name: Prisma-Client generieren
+        run: npx prisma generate
+      - name: Migrationen anwenden
+        run: npx prisma migrate deploy
+      - name: Auf Ghost warten
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:2368/ghost/api/admin/site/ -o /dev/null -w "" || [ $? -eq 22 ]; then
+              echo "Ghost antwortet."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Ghost ist nicht erreichbar geworden." >&2
+          exit 1
+      - name: Integrationstests
+        run: npm run test:integration

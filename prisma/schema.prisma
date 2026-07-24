@@ -1,0 +1,212 @@
+// VTM Studio – Kern-Datenmodell (vollständig ab M1, Logik folgt je Meilenstein)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rolle {
+  HERAUSGEBER
+  REDAKTEUR
+}
+
+enum ArtikelStatus {
+  EINGEGANGEN
+  IN_AUFBEREITUNG
+  REVIEW
+  KUNDENFREIGABE
+  BEREIT
+  IN_GHOST
+}
+
+enum ArtikelFormat {
+  EINORDNUNG
+  ANALYSE
+  PRAXIS_CASE
+  LEITFADEN
+  SPONSORED
+  INTERVIEW
+}
+
+enum LinkedInKanal {
+  VTM
+  PERSONAL
+}
+
+enum FreigabeStatus {
+  OFFEN
+  FREIGEGEBEN
+  AENDERUNG_ANGEFRAGT
+  ABGELAUFEN
+}
+
+enum JobStatus {
+  WARTEND
+  LAEUFT
+  FERTIG
+  FEHLGESCHLAGEN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  rolle         Rolle     @default(REDAKTEUR)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  artikel   Artikel[]
+  auditLogs AuditLog[]
+}
+
+// ── Auth.js-Tabellen ────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── Redaktion ───────────────────────────────────────────────────────────────
+
+model Artikel {
+  id                 String        @id @default(cuid())
+  titel              String
+  format             ArtikelFormat
+  kategorie          String?
+  status             ArtikelStatus @default(EINGEGANGEN)
+  sponsored          Boolean       @default(false)
+  kunde              String?
+  quelltextOriginal  String?       @db.Text
+  quelltextHash      String?
+  cardHtml           String?       @db.Text
+  headlineVorschlaege String[]
+  excerpts           String[]
+  qualitaetsScore    Int?
+  scoreDetails       Json?
+  stilcheckFindings  Json?
+  faktencheckClaims  Json?
+  ghostPostId        String?
+  ghostDraftUrl      String?
+  autorId            String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  autor          User?           @relation(fields: [autorId], references: [id], onDelete: SetNull)
+  linkedInPosts  LinkedInPost[]
+  freigabeTokens FreigabeToken[]
+  jobs           Job[]
+  auditLogs      AuditLog[]
+
+  @@index([status])
+}
+
+model LinkedInPost {
+  id        String        @id @default(cuid())
+  artikelId String
+  kanal     LinkedInKanal
+  text      String        @db.Text
+  bildUrl   String?
+  format    String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  artikel Artikel @relation(fields: [artikelId], references: [id], onDelete: Cascade)
+}
+
+model FreigabeToken {
+  id         String         @id @default(cuid())
+  artikelId  String
+  token      String         @unique
+  kundeEmail String
+  status     FreigabeStatus @default(OFFEN)
+  kommentar  String?        @db.Text
+  gueltigBis DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  artikel Artikel @relation(fields: [artikelId], references: [id], onDelete: Cascade)
+}
+
+// Singleton-Zeile (id = "singleton"); API-Keys liegen ausschließlich als
+// AES-256-GCM-Ciphertext (lib/crypto.ts), niemals im Klartext.
+model Einstellung {
+  id                    String    @id @default("singleton")
+  ghostUrl              String?
+  ghostAdminApiKey      String?
+  anthropicApiKey       String?
+  ctaStandardUrl        String?
+  ctaStandardLabel      String?
+  letzterGhostAbgleich  DateTime?
+  letzterGhostStatus    String?
+  updatedAt             DateTime  @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  artikelId String?
+  aktion    String
+  details   Json?
+  createdAt DateTime @default(now())
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  artikel Artikel? @relation(fields: [artikelId], references: [id], onDelete: Cascade)
+
+  @@index([artikelId])
+}
+
+// Einfache DB-Queue mit Status-Polling (Verarbeitung ab M2)
+model Job {
+  id            String    @id @default(cuid())
+  artikelId     String
+  typ           String
+  status        JobStatus @default(WARTEND)
+  schritt       Int       @default(0)
+  schrittStatus Json?
+  fehler        String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  artikel Artikel @relation(fields: [artikelId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}

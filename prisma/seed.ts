@@ -106,9 +106,12 @@ async function main() {
     },
   ];
 
-  for (const artikel of beispiele) {
-    const vorhanden = await prisma.artikel.findFirst({ where: { titel: artikel.titel } });
-    if (!vorhanden) {
+  // Beispielartikel nur in eine leere Datenbank einspielen: Sobald Artikel
+  // existieren (echte oder Demo), legt ein erneuter Seed-Lauf nichts nach –
+  // gelöschte Demo-Artikel tauchen so beim nächsten Deploy nicht wieder auf.
+  const artikelVorhanden = await prisma.artikel.count();
+  if (artikelVorhanden === 0) {
+    for (const artikel of beispiele) {
       await prisma.artikel.create({ data: artikel });
     }
   }

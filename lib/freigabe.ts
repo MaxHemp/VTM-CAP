@@ -9,7 +9,12 @@ import { sendeMail } from "@/lib/mail";
 export const FREIGABE_GUELTIGKEIT_TAGE = 14;
 
 export function baueFreigabeUrl(token: string): string {
-  const basis = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
+  // Basis-URL: explizit gesetzte APP_URL, sonst die von Vercel bereitgestellte
+  // Produktions-Domain (Systemvariable, ohne Protokoll), sonst localhost.
+  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : null;
+  const basis = (process.env.APP_URL ?? vercelUrl ?? "http://localhost:3000").replace(/\/+$/, "");
   return `${basis}/freigabe/${token}`;
 }
 

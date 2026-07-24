@@ -12,6 +12,8 @@ const AUDIT_LABELS: Record<string, string> = {
   BENUTZER_ROLLE_GEAENDERT: "Benutzerrolle geändert",
   BENUTZER_ENTFERNT: "Benutzerzugang entfernt",
   ARTIKEL_HOCHGELADEN: "Artikel hochgeladen",
+  ARTIKEL_BEARBEITET: "Artikel bearbeitet",
+  ARTIKEL_GELOESCHT: "Artikel gelöscht",
   ARTIKEL_AUFBEREITET: "Artikel aufbereitet (Review)",
   ARTIKEL_ABSCHNITT_BEARBEITET: "Abschnitt bearbeitet und neu geprüft",
   GHOST_DRAFT_ERSTELLT: "Ghost-Draft erstellt",

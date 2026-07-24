@@ -47,6 +47,32 @@ export interface BoardArtikel {
   qualitaetsScore: number | null;
   autorName: string | null;
   updatedAt: Date;
+  hatCard: boolean;
+  ghostDraftUrl: string | null;
+}
+
+// Handlungsleitender nächster Schritt je Status (Pipeline-Karten).
+export function naechsterSchritt(artikel: BoardArtikel): { label: string; href: string; extern?: boolean } {
+  switch (artikel.status) {
+    case "EINGEGANGEN":
+      return { label: "Aufbereitung starten", href: `/artikel/${artikel.id}` };
+    case "IN_AUFBEREITUNG":
+      return { label: "Verarbeitung verfolgen", href: `/artikel/${artikel.id}` };
+    case "REVIEW":
+      return artikel.hatCard
+        ? { label: "Jetzt prüfen", href: `/artikel/${artikel.id}/review` }
+        : { label: "Details öffnen", href: `/artikel/${artikel.id}` };
+    case "KUNDENFREIGABE":
+      return { label: "Freigabe verwalten", href: "/freigabe" };
+    case "BEREIT":
+      return artikel.hatCard
+        ? { label: "Nach Ghost übertragen", href: `/artikel/${artikel.id}/review` }
+        : { label: "Details öffnen", href: `/artikel/${artikel.id}` };
+    case "IN_GHOST":
+      return artikel.ghostDraftUrl
+        ? { label: "Draft in Ghost öffnen", href: artikel.ghostDraftUrl, extern: true }
+        : { label: "Details öffnen", href: `/artikel/${artikel.id}` };
+  }
 }
 
 export interface BoardSpalte {

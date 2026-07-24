@@ -7,6 +7,14 @@ import { ArtikelKarte } from "@/components/pipeline/ArtikelKarte";
 
 export const dynamic = "force-dynamic";
 
+const WORKFLOW = [
+  "Manuskript ablegen",
+  "Automatische Aufbereitung",
+  "Review und Checks",
+  "Ghost-Draft",
+  "LinkedIn-Post",
+];
+
 export default async function PipelineSeite() {
   const artikel = await prisma.artikel.findMany({
     include: { autor: { select: { name: true } } },
@@ -23,6 +31,8 @@ export default async function PipelineSeite() {
     qualitaetsScore: a.qualitaetsScore,
     autorName: a.autor?.name ?? null,
     updatedAt: a.updatedAt,
+    hatCard: Boolean(a.cardHtml),
+    ghostDraftUrl: a.ghostDraftUrl,
   }));
 
   const spalten = gruppiereNachStatus(boardArtikel);
@@ -42,7 +52,7 @@ export default async function PipelineSeite() {
       {leer ? (
         <EmptyState
           titel="Keine Artikel in der Pipeline"
-          beschreibung="Legen Sie ein Manuskript ab, um die automatische Aufbereitung zu starten."
+          beschreibung="Legen Sie ein Manuskript ab, um die automatische Aufbereitung zu starten. Der Artikel durchläuft dann die Schritte Aufbereitung, Review und Ghost-Draft."
           aktionen={
             <Link href="/artikel/neu" className="button button-primary">
               Ersten Artikel anlegen
@@ -50,7 +60,25 @@ export default async function PipelineSeite() {
           }
         />
       ) : (
-        <div style={{ flex: 1, overflow: "auto", padding: "20px 28px 28px" }}>
+        <div style={{ flex: 1, overflow: "auto", padding: "16px 28px 28px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              flexWrap: "wrap",
+              marginBottom: 16,
+            }}
+          >
+            <ol className="workflow-steps">
+              {WORKFLOW.map((schritt) => (
+                <li key={schritt}>{schritt}</li>
+              ))}
+            </ol>
+            <span style={{ fontSize: "0.76rem", color: "var(--text-muted)" }}>
+              Jede Karte zeigt unten den nächsten Schritt.
+            </span>
+          </div>
           <div
             style={{
               display: "grid",
@@ -64,11 +92,21 @@ export default async function PipelineSeite() {
           >
             {spalten.map((spalte) => (
               <div key={spalte.status} style={{ display: "flex", flexDirection: "column", gap: 10, minHeight: 120 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "2px 4px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "7px 10px",
+                    background: "var(--c-paper-blue)",
+                    border: "1px solid var(--border-soft)",
+                    borderRadius: 6,
+                  }}
+                >
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "0.64rem",
+                      fontSize: "0.62rem",
                       fontWeight: 700,
                       letterSpacing: "0.09em",
                       textTransform: "uppercase",
@@ -79,20 +117,29 @@ export default async function PipelineSeite() {
                   </span>
                   <span
                     style={{
+                      display: "inline-grid",
+                      placeItems: "center",
+                      minWidth: 20,
+                      height: 20,
+                      padding: "0 5px",
+                      borderRadius: 10,
                       fontFamily: "var(--font-mono)",
-                      fontSize: "0.64rem",
-                      fontWeight: 600,
-                      color: "var(--c-blue-700)",
+                      fontSize: "0.62rem",
+                      fontWeight: 700,
+                      color: spalte.artikel.length > 0 ? "var(--c-white)" : "var(--text-muted)",
+                      background: spalte.artikel.length > 0 ? "var(--c-blue-700)" : "var(--c-neutral-200)",
                     }}
                   >
                     {spalte.artikel.length}
                   </span>
+                  <span style={{ flex: 1 }} />
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "0.58rem",
-                      letterSpacing: "0.05em",
+                      fontSize: "0.56rem",
+                      letterSpacing: "0.04em",
                       color: "var(--text-muted)",
+                      textAlign: "right",
                     }}
                   >
                     {spalte.hinweis}
@@ -101,15 +148,15 @@ export default async function PipelineSeite() {
                 {spalte.artikel.length === 0 ? (
                   <div
                     style={{
-                      padding: "18px 14px",
+                      padding: "14px",
                       border: "1px dashed var(--border-soft)",
                       borderRadius: 6,
-                      color: "var(--text-muted)",
-                      fontSize: "0.78rem",
+                      color: "var(--c-neutral-300)",
+                      fontSize: "0.9rem",
                       textAlign: "center",
                     }}
                   >
-                    Keine Artikel
+                    –
                   </div>
                 ) : (
                   spalte.artikel.map((a) => <ArtikelKarte key={a.id} artikel={a} />)

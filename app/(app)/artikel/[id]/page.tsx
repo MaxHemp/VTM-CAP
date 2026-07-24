@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Topbar } from "@/components/shell/Topbar";
 import { FORMAT_LABELS, SCORE_MAXIMUM, STATUS_LABELS } from "@/lib/status";
+import { ArtikelVerwaltung } from "./ArtikelVerwaltung";
+import { VerarbeitungFortsetzen } from "./VerarbeitungFortsetzen";
 
 export const dynamic = "force-dynamic";
 
@@ -31,13 +34,24 @@ function Zeile({ label, wert }: { label: string; wert: React.ReactNode }) {
 
 export default async function ArtikelDetailSeite({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
   const artikel = await prisma.artikel.findUnique({
     where: { id },
-    include: { autor: { select: { name: true } } },
+    include: {
+      autor: { select: { name: true } },
+      jobs: {
+        where: { status: { in: ["WARTEND", "LAEUFT"] } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { id: true },
+      },
+    },
   });
   if (!artikel) {
     notFound();
   }
+  const offenerJob = artikel.jobs[0] ?? null;
+  const darfVerwalten = session?.user.rolle === "HERAUSGEBER";
 
   return (
     <section style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
@@ -58,6 +72,7 @@ export default async function ArtikelDetailSeite({ params }: { params: Promise<{
         }
       />
       <div style={{ flex: 1, overflow: "auto", padding: "22px 28px" }}>
+        {offenerJob ? <VerarbeitungFortsetzen jobId={offenerJob.id} /> : null}
         <div className="card" style={{ maxWidth: 720, padding: "20px 22px" }}>
           <h3
             style={{
@@ -100,13 +115,26 @@ export default async function ArtikelDetailSeite({ params }: { params: Promise<{
               wert={artikel.updatedAt.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" })}
             />
           </div>
-          {!artikel.cardHtml ? (
+          {!artikel.cardHtml && !offenerJob ? (
             <p style={{ margin: "16px 0 0", color: "var(--text-muted)", fontSize: "0.8rem", lineHeight: 1.6 }}>
               Für diesen Artikel liegt noch keine aufbereitete Card vor. Laden Sie das Manuskript über „Neuer
               Artikel“ hoch, um die Aufbereitung zu starten.
             </p>
           ) : null}
         </div>
+        {darfVerwalten ? (
+          <ArtikelVerwaltung
+            artikel={{
+              id: artikel.id,
+              titel: artikel.titel,
+              kategorie: artikel.kategorie,
+              format: artikel.format,
+              status: artikel.status,
+              sponsored: artikel.sponsored,
+              kunde: artikel.kunde,
+            }}
+          />
+        ) : null}
       </div>
     </section>
   );

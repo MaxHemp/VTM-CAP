@@ -24,7 +24,8 @@ function navStil(aktiv: boolean): React.CSSProperties {
     fontSize: "0.86rem",
     fontWeight: aktiv ? 700 : 500,
     color: aktiv ? "#ffffff" : "rgb(255 255 255 / 0.75)",
-    background: aktiv ? "rgb(255 255 255 / 0.10)" : "transparent",
+    background: aktiv ? "rgb(36 104 232 / 0.30)" : "transparent",
+    boxShadow: aktiv ? "inset 2px 0 0 var(--c-blue-600)" : "none",
     textDecoration: "none",
   };
 }

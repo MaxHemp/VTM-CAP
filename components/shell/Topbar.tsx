@@ -20,17 +20,7 @@ export function Topbar({
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "0.62rem",
-            fontWeight: 600,
-            letterSpacing: "0.12em",
-            color: "var(--text-muted)",
-          }}
-        >
-          {bereich}
-        </div>
+        <div className="kicker">{bereich}</div>
         <h1
           style={{
             margin: "3px 0 0",

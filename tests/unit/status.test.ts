@@ -10,6 +10,8 @@ function artikel(teil: Partial<BoardArtikel> & Pick<BoardArtikel, "id" | "status
     qualitaetsScore: null,
     autorName: null,
     updatedAt: new Date("2026-07-01T10:00:00Z"),
+    hatCard: false,
+    ghostDraftUrl: null,
     ...teil,
   };
 }

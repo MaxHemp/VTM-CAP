@@ -59,6 +59,30 @@ input:focus, select:focus, textarea:focus {
 @keyframes vtm-spin {
   to { transform: rotate(360deg); }
 }
+/* ── Kicker & Workflow (VTM Brand Design System Master) ───────────────────── */
+.kicker {
+  display: inline-flex; align-items: center; gap: 0.7rem;
+  color: var(--action);
+  font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.kicker::before {
+  content: ""; width: 1.9rem; height: 2px; flex: none;
+  background: linear-gradient(90deg, var(--c-blue-700), var(--c-blue-600));
+  box-shadow: 0 0 12px rgb(36 104 232 / 0.25);
+}
+.workflow-steps { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0; padding: 0; list-style: none; counter-reset: workflow; }
+.workflow-steps li {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  color: var(--text-secondary); background: var(--c-white);
+  border: 1px solid var(--border-medium); border-radius: var(--radius-s);
+  font-family: var(--font-mono); font-size: 0.64rem; font-weight: 600; letter-spacing: 0.03em;
+  counter-increment: workflow;
+}
+.workflow-steps li::before { content: counter(workflow, decimal-leading-zero); color: var(--action); font-size: 0.58rem; }
+.workflow-steps li:not(:last-child)::after { content: "→"; margin-left: 0.5rem; color: var(--text-muted); }
+.workflow-steps .workflow-brass { color: #6a4905; background: var(--c-brass-100); border-color: rgb(155 112 23 / 0.28); }
 /* Responsive-Pass (M5): mehrspaltige Arbeitsflächen brechen auf schmalen
    Viewports auf eine Spalte um. */
 .review-grid { display: grid; grid-template-columns: 250px minmax(460px, 1fr) 338px; }

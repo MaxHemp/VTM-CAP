@@ -32,6 +32,25 @@ async function main() {
       },
     });
     console.log(`Herausgeber-Zugang sichergestellt: ${adminEmail}`);
+
+    // Produktivmodus (SEED_ADMIN_EMAIL gesetzt): Demo-Daten werden entfernt
+    // statt angelegt. Die Beispielinhalte bleiben Entwicklung/CI vorbehalten.
+    const demoTitel = [
+      "BaFin-Rundschreiben zu KI-Governance: Was jetzt auf Versicherer zukommt",
+      "Dunkelverarbeitung in der Kfz-Schadenregulierung: Der Reifegrad-Report",
+      "Wie die Provinzial ihre Antragsstrecken mit Process Mining beschleunigt",
+      "Digitale Aktenverwaltung im Maklerbetrieb: Fünf Stellhebel für den Umstieg",
+      "Leitfaden: Ghost-CMS-Workflows für Fachredaktionen richtig aufsetzen",
+      "Interview: „Embedded Insurance wird 2027 zum Hygienefaktor“",
+    ];
+    const geloeschteArtikel = await prisma.artikel.deleteMany({ where: { titel: { in: demoTitel } } });
+    const geloeschteBenutzer = await prisma.user.deleteMany({
+      where: { email: { in: ["herausgeber@vtm-studio.example", "redaktion@vtm-studio.example"] } },
+    });
+    console.log(
+      `Produktivmodus: ${geloeschteArtikel.count} Demo-Artikel und ${geloeschteBenutzer.count} Demo-Benutzer entfernt; keine Beispieldaten angelegt.`
+    );
+    return;
   }
 
   const herausgeber = await prisma.user.upsert({

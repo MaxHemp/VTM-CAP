@@ -17,6 +17,23 @@ const DEMO_ROHTEXT =
   "Wer klein startet und schnell lernt, verschafft sich einen messbaren Vorsprung.";
 
 async function main() {
+  // Optionaler echter Herausgeber-Zugang aus der Umgebung (SEED_ADMIN_EMAIL):
+  // Legt den Betreiber-Account mit voller Rolle an, damit die erste Anmeldung
+  // nicht als REDAKTEUR endet. Idempotent; hebt eine bestehende Rolle an.
+  const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+  if (adminEmail) {
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: { rolle: Rolle.HERAUSGEBER },
+      create: {
+        email: adminEmail,
+        name: process.env.SEED_ADMIN_NAME?.trim() || adminEmail.split("@")[0],
+        rolle: Rolle.HERAUSGEBER,
+      },
+    });
+    console.log(`Herausgeber-Zugang sichergestellt: ${adminEmail}`);
+  }
+
   const herausgeber = await prisma.user.upsert({
     where: { email: "herausgeber@vtm-studio.example" },
     update: {},

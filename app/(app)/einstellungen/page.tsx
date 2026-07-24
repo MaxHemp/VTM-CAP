@@ -3,15 +3,14 @@ import { prisma } from "@/lib/db";
 import { ladeEinstellungenFuerAnzeige } from "@/lib/einstellungen";
 import { Topbar } from "@/components/shell/Topbar";
 import { GhostEinstellungenForm, RedaktionEinstellungenForm } from "./EinstellungenFormulare";
+import { TeamVerwaltung } from "./TeamVerwaltung";
 
 export const dynamic = "force-dynamic";
 
-const ROLLEN_LABELS: Record<string, string> = {
-  HERAUSGEBER: "Herausgeber",
-  REDAKTEUR: "Redakteur",
-};
-
 const AUDIT_LABELS: Record<string, string> = {
+  BENUTZER_EINGELADEN: "Benutzer eingeladen",
+  BENUTZER_ROLLE_GEAENDERT: "Benutzerrolle geändert",
+  BENUTZER_ENTFERNT: "Benutzerzugang entfernt",
   ARTIKEL_HOCHGELADEN: "Artikel hochgeladen",
   ARTIKEL_AUFBEREITET: "Artikel aufbereitet (Review)",
   ARTIKEL_ABSCHNITT_BEARBEITET: "Abschnitt bearbeitet und neu geprüft",
@@ -68,49 +67,16 @@ export default async function EinstellungenSeite() {
             ctaStandardLabel={einstellungen.ctaStandardLabel}
             darfBearbeiten={darfBearbeiten}
           />
-          <div className="card" style={{ padding: "20px 22px" }}>
-            <h3
-              style={{
-                margin: "0 0 14px",
-                fontFamily: "var(--font-display)",
-                fontSize: "1rem",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Team und Rollen
-            </h3>
-            <div style={{ display: "grid" }}>
-              {team.length === 0 ? (
-                <p style={{ margin: 0, color: "var(--text-muted)", fontSize: "0.84rem" }}>
-                  Noch keine Benutzer vorhanden. Benutzer entstehen bei der ersten Anmeldung per Magic-Link.
-                </p>
-              ) : (
-                team.map((mitglied) => (
-                  <div
-                    key={mitglied.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      padding: "9px 0",
-                      borderTop: "1px solid var(--border-soft)",
-                    }}
-                  >
-                    <span style={{ flex: 1, fontSize: "0.86rem", fontWeight: 600 }}>
-                      {mitglied.name ?? mitglied.email}
-                    </span>
-                    <span
-                      className={mitglied.rolle === "HERAUSGEBER" ? "status status-mandatory" : "status status-recommended"}
-                      style={{ minHeight: 20, padding: "0.1rem 0.4rem", fontSize: "0.54rem" }}
-                    >
-                      {ROLLEN_LABELS[mitglied.rolle]}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          <TeamVerwaltung
+            team={team.map((mitglied) => ({
+              id: mitglied.id,
+              name: mitglied.name,
+              email: mitglied.email,
+              rolle: mitglied.rolle,
+            }))}
+            eigeneId={session?.user.id ?? null}
+            darfBearbeiten={darfBearbeiten}
+          />
           <div className="card" style={{ padding: "20px 22px" }}>
             <h3
               style={{

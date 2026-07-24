@@ -73,7 +73,7 @@ npx prisma db seed          # Beispieldaten für das Pipeline-Board
 npm run dev                 # http://localhost:3000
 ```
 
-Anmeldung: E-Mail-Adresse eingeben; ohne `SMTP_*`-Konfiguration erscheint der Magic-Link in der Konsole des Dev-Servers. Der erste Benutzer wird als `REDAKTEUR` angelegt; die Rolle `HERAUSGEBER` wird per SQL/Prisma Studio gesetzt (`npx prisma studio`).
+Anmeldung: E-Mail-Adresse eingeben; ohne `SMTP_*`-Konfiguration erscheint der Magic-Link in der Konsole des Dev-Servers. **Anmelden können sich nur hinterlegte Benutzer** (Einladungs-Prinzip): Der erste Herausgeber-Zugang entsteht über den Seed (`SEED_ADMIN_EMAIL`/`SEED_ADMIN_NAME`), alle weiteren werden unter Einstellungen → „Team und Zugänge" eingeladen (Rolle wählbar, Einladung per E-Mail, Rollenwechsel und Entfernen inklusive – der letzte Herausgeber ist geschützt).
 
 ## Deployment (Vercel + Neon)
 

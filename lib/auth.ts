@@ -3,6 +3,7 @@ import Nodemailer from "next-auth/providers/nodemailer";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { createTransport } from "nodemailer";
 import type { Rolle } from "@prisma/client";
+import { istAnmeldungErlaubt } from "@/lib/benutzer";
 import { prisma } from "@/lib/db";
 
 // Magic-Link-Versand: mit konfiguriertem SMTP_HOST per E-Mail, sonst wird der
@@ -51,10 +52,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    // Einladungs-Prinzip: Anmelden kann sich nur, wessen E-Mail-Adresse
+    // bereits als Benutzer hinterlegt ist (Einstellungen → Team und Zugänge).
+    // Der Guard greift sowohl beim Anfordern des Links (es wird keine Mail
+    // an fremde Adressen verschickt) als auch beim Einlösen.
+    async signIn({ user }) {
+      return istAnmeldungErlaubt(user.email);
+    },
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.rolle = (user as { rolle?: Rolle }).rolle ?? "REDAKTEUR";
+        return token;
+      }
+      // Zugang und Rolle bei jedem Request gegen die Datenbank prüfen:
+      // Entfernte Benutzer werden sofort abgemeldet, Rollenänderungen
+      // greifen ohne Neuanmeldung.
+      if (token.id) {
+        const benutzer = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { rolle: true },
+        });
+        if (!benutzer) {
+          return null;
+        }
+        token.rolle = benutzer.rolle;
       }
       return token;
     },

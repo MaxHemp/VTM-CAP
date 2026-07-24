@@ -2,6 +2,7 @@
 // des Kunden, Benachrichtigung an den Herausgeber.
 import { randomBytes } from "node:crypto";
 import type { FreigabeToken, Artikel } from "@prisma/client";
+import { baueAppUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/db";
 import { schreibeAuditLog } from "@/lib/audit";
 import { sendeMail } from "@/lib/mail";
@@ -9,13 +10,7 @@ import { sendeMail } from "@/lib/mail";
 export const FREIGABE_GUELTIGKEIT_TAGE = 14;
 
 export function baueFreigabeUrl(token: string): string {
-  // Basis-URL: explizit gesetzte APP_URL, sonst die von Vercel bereitgestellte
-  // Produktions-Domain (Systemvariable, ohne Protokoll), sonst localhost.
-  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : null;
-  const basis = (process.env.APP_URL ?? vercelUrl ?? "http://localhost:3000").replace(/\/+$/, "");
-  return `${basis}/freigabe/${token}`;
+  return `${baueAppUrl()}/freigabe/${token}`;
 }
 
 export async function erstelleFreigabeToken(artikelId: string, kundeEmail: string): Promise<FreigabeToken> {

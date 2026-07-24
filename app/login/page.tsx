@@ -18,14 +18,22 @@ const STATUS_MELDUNGEN: Record<string, { text: string; art: "hinweis" | "fehler"
 export default async function LoginSeite({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; error?: string }>;
 }) {
   const session = await auth();
   if (session?.user) {
     redirect("/pipeline");
   }
-  const { status } = await searchParams;
-  const meldung = status ? STATUS_MELDUNGEN[status] : undefined;
+  const { status, error } = await searchParams;
+  const meldung =
+    error === "AccessDenied"
+      ? {
+          text: "Diese E-Mail-Adresse ist nicht freigeschaltet. Zugänge vergibt der Herausgeber unter Einstellungen → Team und Zugänge.",
+          art: "fehler" as const,
+        }
+      : status
+        ? STATUS_MELDUNGEN[status]
+        : undefined;
 
   async function anmelden(formData: FormData) {
     "use server";

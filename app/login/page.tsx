@@ -22,7 +22,7 @@ export default async function LoginSeite({
 }) {
   const session = await auth();
   if (session?.user) {
-    redirect("/pipeline");
+    redirect("/start");
   }
   const { status, error } = await searchParams;
   const meldung =
@@ -39,7 +39,7 @@ export default async function LoginSeite({
     "use server";
     await signIn("nodemailer", {
       email: String(formData.get("email") ?? ""),
-      redirectTo: "/pipeline",
+      redirectTo: "/start",
     });
   }
 

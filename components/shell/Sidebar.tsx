@@ -4,11 +4,69 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Dezente 15px-Stroke-Icons für die Navigation (Scanbarkeit).
+const ICON_PFADE: Record<string, React.ReactNode> = {
+  start: (
+    <path d="M2.5 7.5 8 2.5l5.5 5v5.5a1 1 0 0 1-1 1h-3v-4h-3v4h-3a1 1 0 0 1-1-1z" />
+  ),
+  pipeline: (
+    <>
+      <rect x="2" y="3" width="3.4" height="10" rx="0.8" />
+      <rect x="6.3" y="3" width="3.4" height="7" rx="0.8" />
+      <rect x="10.6" y="3" width="3.4" height="4.5" rx="0.8" />
+    </>
+  ),
+  neu: (
+    <>
+      <circle cx="8" cy="8" r="5.8" />
+      <path d="M8 5.4v5.2M5.4 8h5.2" />
+    </>
+  ),
+  linkedin: (
+    <>
+      <rect x="2.5" y="2.5" width="11" height="11" rx="1.6" />
+      <path d="M5.4 7v4M5.4 5.1v.1M8 11V8.6c0-.9.7-1.6 1.6-1.6s1.6.7 1.6 1.6V11" />
+    </>
+  ),
+  einstellungen: (
+    <>
+      <circle cx="8" cy="8" r="2" />
+      <path d="M8 2.6v1.6M8 11.8v1.6M2.6 8h1.6M11.8 8h1.6M4.2 4.2l1.1 1.1M10.7 10.7l1.1 1.1M11.8 4.2l-1.1 1.1M5.3 10.7l-1.1 1.1" />
+    </>
+  ),
+  freigabe: (
+    <>
+      <path d="M8 2.8l4.5 1.6v3.4c0 2.8-1.9 4.7-4.5 5.6-2.6-.9-4.5-2.8-4.5-5.6V4.4z" />
+      <path d="M6 8l1.4 1.4L10.2 6.6" />
+    </>
+  ),
+};
+
+function NavIcon({ name }: { name: string }) {
+  return (
+    <svg
+      aria-hidden
+      width="15"
+      height="15"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flex: "none", opacity: 0.85 }}
+    >
+      {ICON_PFADE[name]}
+    </svg>
+  );
+}
+
 const NAV_EINTRAEGE = [
-  { href: "/pipeline", label: "Pipeline" },
-  { href: "/artikel/neu", label: "Neuer Artikel" },
-  { href: "/linkedin", label: "LinkedIn Studio" },
-  { href: "/einstellungen", label: "Einstellungen" },
+  { href: "/start", label: "Start", icon: "start" },
+  { href: "/pipeline", label: "Pipeline", icon: "pipeline" },
+  { href: "/artikel/neu", label: "Neuer Artikel", icon: "neu" },
+  { href: "/linkedin", label: "LinkedIn Studio", icon: "linkedin" },
+  { href: "/einstellungen", label: "Einstellungen", icon: "einstellungen" },
 ];
 
 const ROLLEN_LABELS: Record<string, string> = {
@@ -18,7 +76,9 @@ const ROLLEN_LABELS: Record<string, string> = {
 
 function navStil(aktiv: boolean): React.CSSProperties {
   return {
-    display: "block",
+    display: "flex",
+    alignItems: "center",
+    gap: 9,
     padding: "9px 12px",
     borderRadius: 4,
     fontSize: "0.86rem",
@@ -90,6 +150,7 @@ export function Sidebar({
       <nav style={{ display: "flex", flexDirection: "column", gap: 2, padding: "14px 12px 8px" }}>
         {NAV_EINTRAEGE.map((eintrag) => (
           <Link key={eintrag.href} href={eintrag.href} style={navStil(pathname.startsWith(eintrag.href))}>
+            <NavIcon name={eintrag.icon} />
             {eintrag.label}
           </Link>
         ))}
@@ -108,6 +169,7 @@ export function Sidebar({
           EXTERN
         </div>
         <Link href="/freigabe" style={navStil(pathname.startsWith("/freigabe"))}>
+          <NavIcon name="freigabe" />
           Sponsored-Freigabe
         </Link>
       </div>
